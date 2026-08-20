@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kick Goli Soda — Heritage Meets Fizz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl font-black text-emerald-400 tracking-wider">KICK</span>
+        <span class="text-xs uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Goli Soda</span>
+      </div>
+      <div class="text-sm text-zinc-400">
+        Status: <span id="db-status" class="text-emerald-400 font-mono">● Supabase Active</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="py-16 text-center max-w-3xl mx-auto px-4">
+    <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
+      Pop the Marble. <br/><span class="text-emerald-400">Feel the Kick.</span>
+    </h1>
+    <p class="text-zinc-400 text-lg mb-8">
+      Authentic Indian street soda upgraded with bold fusion flavors and premium fizz.
+    </p>
+  </section>
+
+  <!-- Catalog Section -->
+  <main class="max-w-6xl mx-auto px-4 pb-20 flex-1 w-full">
+    <div class="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
+      <h2 class="text-xl font-bold">Our Flavors</h2>
+      <div id="status-indicator" class="text-xs text-zinc-500 font-mono">Loading menu...</div>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="flavor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse h-48"></div>
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse h-48"></div>
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse h-48"></div>
+    </div>
+  </main>
+
+  <!-- Script Connecting to Your Live Supabase DB -->
+  <script>
+    const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function fetchFlavors() {
+      const grid = document.getElementById('flavor-grid');
+      const status = document.getElementById('status-indicator');
+
+      try {
+        const { data, error } = await supabase
+          .from('flavors')
+          .select('*');
+
+        if (error) throw error;
+
+        status.textContent = `${data.length} items loaded`;
+        grid.innerHTML = data.map(item => `
+          <div class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition duration-300 rounded-xl p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">${item.category || 'Flavor'}</span>
+                ${item.badge ? `<span class="text-xs font-bold text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">${item.badge}</span>` : ''}
+              </div>
+              <h3 class="text-xl font-bold mb-1">${item.name}</h3>
+              <p class="text-zinc-400 text-sm mb-4">${item.description || ''}</p>
+            </div>
+            <div class="flex justify-between items-center pt-4 border-t border-zinc-800/60">
+              <span class="text-2xl font-black text-white">₹${item.price}</span>
+              <button class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-4 py-2 rounded-lg text-sm transition">
+                Add to Order
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        console.error('Database connection error:', err);
+        status.textContent = 'Error loading menu';
+        grid.innerHTML = `<p class="text-red-400 col-span-full">Failed to load flavors from database.</p>`;
+      }
+    }
+
+    fetchFlavors();
+  </script>
+</body>
+</html>
