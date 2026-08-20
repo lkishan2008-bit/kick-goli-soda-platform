@@ -63,14 +63,23 @@
           .from('flavors')
           .select('*');
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase Error:', error);
+          throw error;
+        }
+
+        if (!data || data.length === 0) {
+          status.textContent = '0 items found';
+          grid.innerHTML = `<p class="text-zinc-400 col-span-full">No soda flavors available in the database yet.</p>`;
+          return;
+        }
 
         status.textContent = `${data.length} items loaded`;
         grid.innerHTML = data.map(item => `
           <div class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition duration-300 rounded-xl p-6 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-start mb-2">
-                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">${item.category || 'Flavor'}</span>
+                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">${item.category}</span>
                 ${item.badge ? `<span class="text-xs font-bold text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">${item.badge}</span>` : ''}
               </div>
               <h3 class="text-xl font-bold mb-1">${item.name}</h3>
@@ -87,8 +96,13 @@
 
       } catch (err) {
         console.error('Database connection error:', err);
-        status.textContent = 'Error loading menu';
-        grid.innerHTML = `<p class="text-red-400 col-span-full">Failed to load flavors from database.</p>`;
+        status.textContent = 'Connection Error';
+        grid.innerHTML = `
+          <div class="col-span-full bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
+            <p class="text-red-400 font-semibold mb-2">Failed to load flavors from database.</p>
+            <p class="text-xs text-zinc-400 font-mono">${err.message || 'Check browser Developer Console (F12) for details.'}</p>
+          </div>
+        `;
       }
     }
 
