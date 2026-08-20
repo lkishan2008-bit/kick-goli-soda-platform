@@ -47,26 +47,23 @@
     </div>
   </main>
 
-  <!-- Script Connecting to Your Live Supabase DB -->
   <script>
     const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Renamed variable to avoid conflict with window.supabase
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function fetchFlavors() {
       const grid = document.getElementById('flavor-grid');
       const status = document.getElementById('status-indicator');
 
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('flavors')
           .select('*');
 
-        if (error) {
-          console.error('Supabase Error:', error);
-          throw error;
-        }
+        if (error) throw error;
 
         if (!data || data.length === 0) {
           status.textContent = '0 items found';
@@ -100,7 +97,7 @@
         grid.innerHTML = `
           <div class="col-span-full bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
             <p class="text-red-400 font-semibold mb-2">Failed to load flavors from database.</p>
-            <p class="text-xs text-zinc-400 font-mono">${err.message || 'Check browser Developer Console (F12) for details.'}</p>
+            <p class="text-xs text-zinc-400 font-mono">${err.message || 'Check console for details.'}</p>
           </div>
         `;
       }
