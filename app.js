@@ -217,6 +217,8 @@ function updateCartUI() {
   cartTaxes.textContent = `₹${taxes}`;
   cartTotal.textContent = `₹${grandTotal}`;
 
+  updateFloatingCartBar(totalCount, grandTotal);
+
   checkoutBtn.disabled = cart.length === 0;
 
   if (cart.length === 0) {
@@ -415,3 +417,33 @@ async function fetchFlavors() {
 }
 
 fetchFlavors();
+
+// Floating Cart Visibility on Scroll
+const floatingBar = document.getElementById('floating-cart-bar');
+const menuSection = document.getElementById('menu');
+
+window.addEventListener('scroll', () => {
+  if (!menuSection || !floatingBar) return;
+  const menuPosition = menuSection.getBoundingClientRect().top;
+  
+  // Show bar once scrolled past the top of the menu section
+  if (menuPosition < window.innerHeight - 100) {
+    floatingBar.classList.remove('translate-y-24', 'opacity-0');
+  } else {
+    floatingBar.classList.add('translate-y-24', 'opacity-0');
+  }
+});
+
+// Helper function to call whenever cart updates
+function updateFloatingCartBar(itemCount, totalPrice) {
+  const totalElem = document.getElementById('float-cart-total');
+  if (totalElem) {
+    totalElem.textContent = `${itemCount} item${itemCount === 1 ? '' : 's'} • ₹${totalPrice}`;
+  }
+}
+
+// Wire floating checkout button to open existing cart drawer
+document.getElementById('float-checkout-btn')?.addEventListener('click', () => {
+  const mainCartBtn = document.getElementById('cart-toggle-btn');
+  mainCartBtn?.click();
+});
