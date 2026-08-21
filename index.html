@@ -211,6 +211,53 @@
     </div>
   </div>
 
+  <!-- Order Receipt Modal -->
+  <div id="receipt-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl text-zinc-100" id="receipt-printable">
+      <div class="text-center border-b border-zinc-800 pb-4">
+        <span class="bg-emerald-500 text-zinc-950 font-black px-2.5 py-1 rounded-lg text-xs tracking-wider inline-block mb-2">KICK GOLI SODA</span>
+        <h3 class="text-lg font-bold text-white">Order Confirmed! 🎉</h3>
+        <p class="text-xs text-zinc-400">Thank you for your order</p>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between text-zinc-400">
+          <span>Order ID:</span>
+          <span id="receipt-order-id" class="font-mono text-emerald-400 font-bold">#---</span>
+        </div>
+        <div class="flex justify-between text-zinc-400">
+          <span>UTR / Txn ID:</span>
+          <span id="receipt-utr" class="font-mono text-zinc-200">---</span>
+        </div>
+        <div class="flex justify-between text-zinc-400">
+          <span>Date:</span>
+          <span id="receipt-date" class="text-zinc-200">---</span>
+        </div>
+      </div>
+
+      <div class="border-t border-b border-zinc-800 py-3 space-y-2">
+        <p class="text-xs font-bold text-zinc-300">Items Ordered:</p>
+        <div id="receipt-items-list" class="space-y-1 text-xs text-zinc-400 max-h-32 overflow-y-auto">
+          <!-- Dynamically filled -->
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-sm font-bold">
+        <span class="text-zinc-300">Total Paid:</span>
+        <span id="receipt-total" class="text-emerald-400 text-base">₹0</span>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="window.print()" class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded-xl text-xs transition border border-zinc-700">
+          🖨️ Print Receipt
+        </button>
+        <button onclick="closeReceiptModal()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold py-2 rounded-xl text-xs transition">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- External JS -->
   <script src="app.js"></script>
 </body>

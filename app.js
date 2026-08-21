@@ -215,6 +215,29 @@ async function confirmUpiPayment() {
   }
 }
 
+function showOrderReceipt(orderData) {
+  document.getElementById('receipt-order-id').textContent = `#${orderData.id || 'SUCCESS'}`;
+  document.getElementById('receipt-utr').textContent = orderData.utr_number || window.currentOrderUTR || 'N/A';
+  document.getElementById('receipt-date').textContent = new Date().toLocaleString();
+  document.getElementById('receipt-total').textContent = `₹${orderData.total_amount}`;
+
+  const itemsContainer = document.getElementById('receipt-items-list');
+  if (Array.isArray(orderData.items)) {
+    itemsContainer.innerHTML = orderData.items.map(i => `
+      <div class="flex justify-between">
+        <span>${i.name} x${i.quantity}</span>
+        <span class="font-mono">₹${i.price * i.quantity}</span>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('receipt-modal').classList.remove('hidden');
+}
+
+function closeReceiptModal() {
+  document.getElementById('receipt-modal').classList.add('hidden');
+}
+
 // Order Submission
 async function submitOrder() {
   submitOrderBtn.disabled = true;
@@ -241,20 +264,23 @@ async function submitOrder() {
       orderPayload.utr_number = window.currentOrderUTR;
     }
 
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('orders')
-      .insert([orderPayload]);
+      .insert([orderPayload])
+      .select();
 
     if (error) throw error;
 
     playPop();
+    const createdOrder = (data && data.length > 0) ? data[0] : orderPayload;
+
+    showOrderReceipt(createdOrder);
     cart = [];
     window.currentOrderUTR = null;
     if (document.getElementById('upi-utr')) document.getElementById('upi-utr').value = '';
     updateCartUI();
     checkoutModal.classList.add('hidden');
     orderForm.reset();
-    alert('🎉 Order placed successfully! We are preparing your fizz.');
 
   } catch (err) {
     console.error('Order submission error:', err);
