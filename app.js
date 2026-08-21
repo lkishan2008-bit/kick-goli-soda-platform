@@ -40,6 +40,38 @@ function playPop() {
   }
 }
 
+// Toast Notifications
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const colors = {
+    success: 'bg-emerald-500 text-zinc-950',
+    error:   'bg-red-500 text-white',
+    info:    'bg-zinc-700 text-zinc-100',
+    warning: 'bg-amber-500 text-zinc-950',
+  };
+
+  const icons = {
+    success: '✅',
+    error:   '❌',
+    info:    'ℹ️',
+    warning: '⚠️',
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-xs font-bold translate-x-0 transition-all duration-300 ${colors[type] || colors.info}`;
+  toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 // Cart Drawer Visibility
 function toggleCart(open) {
   if (open) {
