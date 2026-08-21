@@ -1,0 +1,23 @@
+/* Custom Scrollbars & Base Utility Extensions */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Modal Smooth Fade */
+#checkout-modal, #cart-overlay {
+  transition: opacity 0.2s ease-in-out;
+}
