@@ -27,9 +27,9 @@ const orderForm = document.getElementById('order-form');
 const submitOrderBtn = document.getElementById('submit-order-btn');
 const checkoutError = document.getElementById('checkout-error');
 
-const trackModalBtn = document.getElementById('track-modal-btn');
-const trackModal = document.getElementById('track-modal');
-const trackCloseBtn = document.getElementById('track-close-btn');
+const trackingModal = document.getElementById('tracking-modal');
+const trackBtn = document.getElementById('track-modal-btn') || document.getElementById('track-order-nav');
+const closeTrackBtn = document.getElementById('close-tracking-btn');
 const popSound = document.getElementById('pop-sound');
 
 // Play Pop Sound Effect
@@ -88,9 +88,25 @@ cartToggleBtn.addEventListener('click', () => toggleCart(true));
 cartCloseBtn.addEventListener('click', () => toggleCart(false));
 cartOverlay.addEventListener('click', () => toggleCart(false));
 
-// Tracking Modal Visibility
-if (trackModalBtn) trackModalBtn.addEventListener('click', () => trackModal.classList.remove('hidden'));
-if (trackCloseBtn) trackCloseBtn.addEventListener('click', () => trackModal.classList.add('hidden'));
+// Tracking Modal Controls
+if (trackBtn) {
+  trackBtn.addEventListener('click', () => trackingModal.classList.remove('hidden'));
+}
+if (closeTrackBtn) {
+  closeTrackBtn.addEventListener('click', () => trackingModal.classList.add('hidden'));
+}
+
+document.getElementById('search-track-btn')?.addEventListener('click', () => {
+  const query = document.getElementById('track-input').value.trim();
+  const resultContainer = document.getElementById('tracking-result');
+  
+  if (!query) return;
+
+  // Render dummy data or replace with your Supabase query
+  document.getElementById('res-order-id').textContent = query.startsWith('#') ? query : '#1084';
+  document.getElementById('res-status').textContent = 'Out for Delivery 🛵';
+  resultContainer.classList.remove('hidden');
+});
 
 // Checkout Modal Visibility
 checkoutBtn.addEventListener('click', () => {
