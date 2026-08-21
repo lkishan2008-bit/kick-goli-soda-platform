@@ -184,10 +184,39 @@ function updateCartUI() {
   `).join('');
 }
 
+// Temporary UPI Configuration (Update later with client's bank-linked VPA)
+const UPI_ID = "kickgolisoda@upi"; 
+const MERCHANT_NAME = "Kick Goli Soda";
+
+function openUpiCheckout(totalAmount) {
+  const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${totalAmount}&cu=INR`;
+  const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+
+  document.getElementById('upi-qr-img').src = qrApi;
+  document.getElementById('upi-amount').textContent = `₹${totalAmount}`;
+  document.getElementById('upi-modal').classList.remove('hidden');
+}
+
+function closeUpiModal() {
+  document.getElementById('upi-modal').classList.add('hidden');
+}
+
+async function confirmUpiPayment() {
+  const utr = document.getElementById('upi-utr').value.trim();
+  if (!utr) {
+    alert('Please enter your 12-digit UTR or Transaction ID.');
+    return;
+  }
+
+  window.currentOrderUTR = utr;
+  closeUpiModal();
+  if (typeof submitOrder === 'function') {
+    await submitOrder();
+  }
+}
+
 // Order Submission
-orderForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
+async function submitOrder() {
   submitOrderBtn.disabled = true;
   submitOrderBtn.textContent = 'Submitting Order...';
   checkoutError.classList.add('hidden');
@@ -200,20 +229,28 @@ orderForm.addEventListener('submit', async (e) => {
   const grandTotal = subtotal + (subtotal > 0 ? Math.round(subtotal * 0.05) : 0);
 
   try {
+    const orderPayload = {
+      customer_name: name,
+      phone: phone,
+      address: address,
+      items: cart,
+      total_amount: grandTotal
+    };
+
+    if (window.currentOrderUTR) {
+      orderPayload.utr_number = window.currentOrderUTR;
+    }
+
     const { error } = await supabaseClient
       .from('orders')
-      .insert([{
-        customer_name: name,
-        phone: phone,
-        address: address,
-        items: cart,
-        total_amount: grandTotal
-      }]);
+      .insert([orderPayload]);
 
     if (error) throw error;
 
     playPop();
     cart = [];
+    window.currentOrderUTR = null;
+    if (document.getElementById('upi-utr')) document.getElementById('upi-utr').value = '';
     updateCartUI();
     checkoutModal.classList.add('hidden');
     orderForm.reset();
@@ -227,6 +264,13 @@ orderForm.addEventListener('submit', async (e) => {
     submitOrderBtn.disabled = false;
     submitOrderBtn.textContent = 'Confirm Order';
   }
+}
+
+orderForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const grandTotal = subtotal + (subtotal > 0 ? Math.round(subtotal * 0.05) : 0);
+  openUpiCheckout(grandTotal);
 });
 
 // Live Order Tracking Search
