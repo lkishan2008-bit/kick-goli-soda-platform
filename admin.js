@@ -209,9 +209,16 @@ const storeLabel = document.getElementById('store-status-label');
 
 storeToggle?.addEventListener('change', (e) => {
   const isOnline = e.target.checked;
+  localStorage.setItem('store_online', isOnline);
+  
   if (storeLabel) {
     storeLabel.textContent = isOnline ? 'Store Online' : 'Store Offline';
     storeLabel.className = isOnline ? 'font-semibold text-emerald-400' : 'font-semibold text-rose-400';
   }
-  // Store state can be synced with Supabase settings table if needed
 });
+
+// Initialize toggle state from localStorage
+if (storeToggle && localStorage.getItem('store_online') === 'false') {
+  storeToggle.checked = false;
+  storeToggle.dispatchEvent(new Event('change'));
+}

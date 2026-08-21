@@ -15,6 +15,30 @@ let cart = [];
 let menuFlavors = [];
 let activeCategory = 'All';
 
+// Store Availability State Listener
+function updateStoreState(isOnline) {
+  const offlineBanner = document.getElementById('store-offline-banner');
+  const checkoutBtns = document.querySelectorAll('#checkout-btn, #float-checkout-btn');
+  
+  if (!isOnline) {
+    offlineBanner?.classList.remove('hidden');
+    checkoutBtns.forEach(btn => {
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+  } else {
+    offlineBanner?.classList.add('hidden');
+    checkoutBtns.forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    });
+  }
+}
+
+// Read store state from localStorage (or Supabase settings table)
+const savedStoreState = localStorage.getItem('store_online') !== 'false';
+updateStoreState(savedStoreState);
+
 // UI Selectors
 const cartToggleBtn = document.getElementById('cart-toggle-btn');
 const cartCloseBtn = document.getElementById('cart-close-btn');
