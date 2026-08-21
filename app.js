@@ -115,41 +115,48 @@ function filterFlavors(category) {
 
 // Render Flavors with Bottle Pictures
 function renderFlavors() {
-  const grid = document.getElementById('flavor-grid');
+  const grid = document.getElementById('flavor-grid') || document.getElementById('flavors-grid');
   const status = document.getElementById('status-indicator');
+  if (!grid) return;
 
   const filtered = activeCategory === 'All' 
     ? menuFlavors 
-    : menuFlavors.filter(f => f.category.toUpperCase() === activeCategory);
+    : menuFlavors.filter(f => f.category && f.category.toUpperCase() === activeCategory);
 
-  status.textContent = `${filtered.length} flavors shown`;
+  if (status) status.textContent = `${filtered.length} flavors shown`;
 
   if (filtered.length === 0) {
     grid.innerHTML = `<p class="text-zinc-400 col-span-full py-8 text-center">No flavors found in this category.</p>`;
     return;
   }
 
-  grid.innerHTML = filtered.map(item => `
-    <div class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition duration-300 rounded-xl p-5 flex flex-col justify-between overflow-hidden group">
-      <div>
-        <div class="w-full h-48 bg-zinc-950 rounded-lg mb-4 overflow-hidden flex items-center justify-center p-2 border border-zinc-800/80">
-          <img src="${item.image_url || 'images/jeera-lemon.jpg'}" alt="${item.name}" class="h-full object-contain group-hover:scale-105 transition duration-300" />
+  grid.innerHTML = filtered.map(f => {
+    const isAvailable = f.is_available !== false; // defaults to true
+
+    return `
+      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden ${!isAvailable ? 'opacity-60' : ''}">
+        ${!isAvailable ? '<span class="absolute top-3 right-3 bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>' : ''}
+        
+        <img src="${f.image_url || 'images/' + f.name.toLowerCase().replace(/\\s+/g, '-') + '.jpg'}" alt="${f.name}" class="w-full h-36 object-contain mb-3 rounded-xl">
+        
+        <div class="space-y-1 mb-4">
+          <h3 class="font-bold text-white text-sm">${f.name}</h3>
+          <p class="text-emerald-400 font-extrabold text-sm">₹${f.price}</p>
         </div>
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">${item.category}</span>
-          ${item.badge ? `<span class="text-[10px] font-bold text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">${item.badge}</span>` : ''}
-        </div>
-        <h3 class="text-lg font-bold mb-1 text-white">${item.name}</h3>
-        <p class="text-zinc-400 text-xs mb-4 line-clamp-2">${item.description || ''}</p>
-      </div>
-      <div class="flex justify-between items-center pt-3 border-t border-zinc-800">
-        <span class="text-xl font-black text-white">₹${item.price}</span>
-        <button onclick="addToCart(${item.id})" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
-          + Add
+
+        <button 
+          onclick="${isAvailable ? `addToCart(${f.id})` : ''}" 
+          ${!isAvailable ? 'disabled' : ''}
+          class="w-full py-2 rounded-xl text-xs font-bold transition ${
+            isAvailable 
+              ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 cursor-pointer' 
+              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'
+          }">
+          ${isAvailable ? 'Add to Cart' : 'Sold Out'}
         </button>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Cart State Operations
