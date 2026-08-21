@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -88,24 +88,30 @@
     </div>
   </section>
 
-  <!-- Catalog Section -->
-  <main id="menu" class="max-w-6xl mx-auto px-4 pb-20 flex-1 w-full">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-zinc-800 pb-4">
-      <div class="flex flex-wrap gap-2" id="category-filters">
-        <button onclick="filterFlavors('All')" class="filter-btn bg-emerald-500 text-zinc-950 font-bold px-4 py-1.5 rounded-full text-xs transition">All</button>
-        <button onclick="filterFlavors('CLASSIC HERITAGE')" class="filter-btn bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white font-semibold px-4 py-1.5 rounded-full text-xs transition">Classic Heritage</button>
-        <button onclick="filterFlavors('SPICY & HERBAL')" class="filter-btn bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white font-semibold px-4 py-1.5 rounded-full text-xs transition">Spicy & Herbal</button>
-        <button onclick="filterFlavors('FUSION FIZZ')" class="filter-btn bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white font-semibold px-4 py-1.5 rounded-full text-xs transition">Fusion Fizz</button>
-      </div>
-      <div id="status-indicator" class="text-xs text-zinc-500 font-mono">Loading menu...</div>
+  <!-- Menu Section -->
+  <section id="menu" class="py-16 px-4 max-w-5xl mx-auto scroll-mt-6">
+    <div class="text-center mb-8">
+      <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Our Menu</h2>
+      <h3 class="text-2xl font-black text-white">Select Your Flavors</h3>
     </div>
 
-    <div id="flavor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse h-48"></div>
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse h-48"></div>
-      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse h-48"></div>
+    <!-- Flavors Quick-Order Table -->
+    <div class="overflow-x-auto bg-zinc-900/80 border border-zinc-800 rounded-2xl shadow-xl backdrop-blur-md">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-zinc-800 bg-zinc-950/60 text-xs text-zinc-400 uppercase tracking-wider">
+            <th class="p-4">Flavor</th>
+            <th class="p-4">Taste Profile</th>
+            <th class="p-4">Price</th>
+            <th class="p-4 text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800/60 text-xs text-zinc-200" id="flavor-table-body">
+          <!-- Rows rendered via app.js or direct HTML -->
+        </tbody>
+      </table>
     </div>
-  </main>
+  </section>
 
   <!-- Order Tracking Modal -->
   <div id="tracking-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
