@@ -126,53 +126,47 @@ function filterFlavors(category) {
       btn.className = 'filter-btn bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white font-semibold px-4 py-1.5 rounded-full text-xs transition';
     }
   });
-  renderFlavors();
+  const filtered = activeCategory === 'All'
+    ? menuFlavors
+    : menuFlavors.filter(f => f.category && f.category.toUpperCase() === activeCategory);
+  renderFlavors(filtered);
 }
 
-// Render Flavors with Bottle Pictures
-function renderFlavors() {
-  const grid = document.getElementById('flavor-grid') || document.getElementById('flavors-grid');
+// Render Flavors as Cards
+function renderFlavors(flavors) {
+  const container = document.getElementById('flavor-grid');
   const status = document.getElementById('status-indicator');
-  if (!grid) return;
+  if (!container) return;
 
-  const filtered = activeCategory === 'All' 
-    ? menuFlavors 
-    : menuFlavors.filter(f => f.category && f.category.toUpperCase() === activeCategory);
+  if (status) status.textContent = `${flavors.length} flavors shown`;
 
-  if (status) status.textContent = `${filtered.length} flavors shown`;
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<p class="text-zinc-400 col-span-full py-8 text-center">No flavors found in this category.</p>`;
+  if (flavors.length === 0) {
+    container.innerHTML = `<p class="text-zinc-400 col-span-full py-8 text-center">No flavors found in this category.</p>`;
     return;
   }
 
-  grid.innerHTML = filtered.map(f => {
-    const isAvailable = f.is_available !== false; // defaults to true
-
-    return `
-      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden ${!isAvailable ? 'opacity-60' : ''}">
-        ${!isAvailable ? '<span class="absolute top-3 right-3 bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>' : ''}
-        
-        <img src="${f.image_url || 'images/' + f.name.toLowerCase().replace(/\\s+/g, '-') + '.jpg'}" alt="${f.name}" class="w-full h-36 object-contain mb-3 rounded-xl">
-        
-        <div class="space-y-1 mb-4">
-          <h3 class="font-bold text-white text-sm">${f.name}</h3>
-          <p class="text-emerald-400 font-extrabold text-sm">₹${f.price}</p>
+  container.innerHTML = flavors.map(flavor => `
+    <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/50 transition duration-300 shadow-xl backdrop-blur-sm group">
+      <div>
+        <div class="relative overflow-hidden rounded-xl mb-4 bg-zinc-950 aspect-square flex items-center justify-center">
+          <img src="${flavor.image_url || ''}" alt="${flavor.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          <span class="absolute top-2 right-2 bg-zinc-950/80 border border-zinc-800 text-emerald-400 font-black text-xs px-2.5 py-1 rounded-lg backdrop-blur-md">
+            ₹${flavor.price}
+          </span>
+          ${flavor.is_available === false ? '<span class="absolute inset-0 bg-zinc-950/70 flex items-center justify-center"><span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span></span>' : ''}
         </div>
-
-        <button 
-          onclick="${isAvailable ? `addToCart(${f.id})` : ''}" 
-          ${!isAvailable ? 'disabled' : ''}
-          class="w-full py-2 rounded-xl text-xs font-bold transition ${
-            isAvailable 
-              ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 cursor-pointer' 
-              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'
-          }">
-          ${isAvailable ? 'Add to Cart' : 'Sold Out'}
-        </button>
+        <h4 class="font-bold text-white text-base mb-1">${flavor.name}</h4>
+        <p class="text-xs text-zinc-400 leading-relaxed mb-4">${flavor.description || 'Authentic handcrafted goli soda.'}</p>
       </div>
-    `;
-  }).join('');
+
+      <button
+        onclick="${flavor.is_available !== false ? `addToCart(${flavor.id})` : ''}"
+        ${flavor.is_available === false ? 'disabled' : ''}
+        class="w-full ${flavor.is_available !== false ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/10' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'} font-black py-2.5 rounded-xl text-xs transition">
+        ${flavor.is_available !== false ? '+ Add to Cart' : 'Sold Out'}
+      </button>
+    </div>
+  `).join('');
 }
 
 // Cart State Operations
@@ -409,7 +403,7 @@ async function fetchFlavors() {
     if (error) throw error;
 
     menuFlavors = data || [];
-    renderFlavors();
+    renderFlavors(menuFlavors);
   } catch (err) {
     console.error('Database connection error:', err);
     status.textContent = 'Connection Error';

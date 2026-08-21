@@ -88,28 +88,16 @@
     </div>
   </section>
 
-  <!-- Menu Section -->
-  <section id="menu" class="py-16 px-4 max-w-5xl mx-auto scroll-mt-6">
-    <div class="text-center mb-8">
-      <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Our Menu</h2>
-      <h3 class="text-2xl font-black text-white">Select Your Flavors</h3>
+  <!-- Menu Section (Visual Card Grid) -->
+  <section id="menu" class="py-16 px-4 max-w-6xl mx-auto scroll-mt-6">
+    <div class="text-center mb-10">
+      <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Our Craft Sodas</h2>
+      <h3 class="text-3xl font-black text-white">Select Your Flavors</h3>
     </div>
 
-    <!-- Flavors Quick-Order Table -->
-    <div class="overflow-x-auto bg-zinc-900/80 border border-zinc-800 rounded-2xl shadow-xl backdrop-blur-md">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="border-b border-zinc-800 bg-zinc-950/60 text-xs text-zinc-400 uppercase tracking-wider">
-            <th class="p-4">Flavor</th>
-            <th class="p-4">Taste Profile</th>
-            <th class="p-4">Price</th>
-            <th class="p-4 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-zinc-800/60 text-xs text-zinc-200" id="flavor-table-body">
-          <!-- Rows rendered via app.js or direct HTML -->
-        </tbody>
-      </table>
+    <!-- Flavor Grid Container -->
+    <div id="flavor-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Flavor cards rendered via JavaScript -->
     </div>
   </section>
 
