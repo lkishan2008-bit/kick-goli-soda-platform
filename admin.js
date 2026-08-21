@@ -33,7 +33,7 @@ async function fetchAdminOrders() {
     if (!tbody) return;
 
     if (orders.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-zinc-500">No orders received yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-zinc-500">No orders received yet.</td></tr>`;
       return;
     }
 
@@ -47,6 +47,9 @@ async function fetchAdminOrders() {
           <td class="px-4 py-3 font-mono text-xs text-emerald-400 font-bold">#${o.id}</td>
           <td class="px-4 py-3 font-semibold text-white">${o.customer_name || 'N/A'}<br><span class="text-[10px] text-zinc-500">${o.address || ''}</span></td>
           <td class="px-4 py-3 text-xs text-zinc-300 font-mono">${o.phone || 'N/A'}</td>
+          <td class="px-4 py-3 text-xs text-emerald-400 font-mono font-bold">
+            ${o.utr_number || 'N/A'}
+          </td>
           <td class="px-4 py-3 text-xs text-zinc-400 max-w-xs truncate">${itemList}</td>
           <td class="px-4 py-3 font-bold text-white">₹${o.total_amount}</td>
           <td class="px-4 py-3">
