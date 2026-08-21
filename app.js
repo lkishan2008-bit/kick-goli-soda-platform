@@ -45,29 +45,30 @@ function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
-  const colors = {
-    success: 'bg-emerald-500 text-zinc-950',
-    error:   'bg-red-500 text-white',
-    info:    'bg-zinc-700 text-zinc-100',
-    warning: 'bg-amber-500 text-zinc-950',
-  };
-
-  const icons = {
-    success: '✅',
-    error:   '❌',
-    info:    'ℹ️',
-    warning: '⚠️',
-  };
-
   const toast = document.createElement('div');
-  toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-xs font-bold translate-x-0 transition-all duration-300 ${colors[type] || colors.info}`;
-  toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span>`;
+  const isSuccess = type === 'success';
+
+  toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold transform transition-all duration-300 translate-y-5 opacity-0 ${
+    isSuccess 
+      ? 'bg-zinc-900 text-emerald-400 border-emerald-500/30' 
+      : 'bg-zinc-900 text-rose-400 border-rose-500/30'
+  }`;
+
+  toast.innerHTML = `
+    <span>${isSuccess ? '✅' : '⚠️'}</span>
+    <span>${message}</span>
+  `;
 
   container.appendChild(toast);
 
+  // Animate in
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(100%)';
+    toast.classList.remove('translate-y-5', 'opacity-0');
+  }, 10);
+
+  // Animate out and remove
+  setTimeout(() => {
+    toast.classList.add('translate-y-5', 'opacity-0');
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
