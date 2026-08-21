@@ -168,12 +168,25 @@ function updateCartUI() {
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
+  const phoneInput = document.getElementById('cust-phone');
+  const phoneWarning = document.getElementById('phone-warning');
+  const phoneDigits = phoneInput.value.replace(/\D/g, '');
+
+  // Validate exactly 10 digits
+  if (phoneDigits.length !== 10) {
+    phoneWarning.classList.remove('hidden');
+    phoneInput.classList.add('border-amber-500');
+    return;
+  } else {
+    phoneWarning.classList.add('hidden');
+    phoneInput.classList.remove('border-amber-500');
+  }
+
   submitOrderBtn.disabled = true;
   submitOrderBtn.textContent = 'Submitting Order...';
   checkoutError.classList.add('hidden');
 
   const name = document.getElementById('cust-name').value;
-  const phone = document.getElementById('cust-phone').value;
   const address = document.getElementById('cust-address').value;
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -184,7 +197,7 @@ orderForm.addEventListener('submit', async (e) => {
       .from('orders')
       .insert([{
         customer_name: name,
-        phone: phone,
+        phone: phoneDigits,
         address: address,
         items: cart,
         total_amount: grandTotal
