@@ -121,10 +121,59 @@ async function updateOrderStatus(orderId, newStatus) {
 
 // Initial Fetch
 fetchAdminOrders();
+fetchAdminFlavors();
 
 // Auto-refresh every 15 seconds
 setInterval(fetchAdminOrders, 15000);
 
+// Fetch & Render Flavor Stock Status
+async function fetchAdminFlavors() {
+  const container = document.getElementById('admin-flavors-grid');
+  if (!container) return;
 
+  try {
+    const { data: flavors, error } = await supabaseAdmin
+      .from('flavors')
+      .select('*')
+      .order('id', { ascending: true });
 
+    if (error) throw error;
+
+    container.innerHTML = flavors.map(f => `
+      <div class="bg-zinc-950 border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
+        <div>
+          <p class="font-bold text-white text-xs">${f.name}</p>
+          <p class="text-[10px] text-zinc-500">₹${f.price}</p>
+        </div>
+        <button 
+          onclick="toggleFlavorStock(${f.id}, ${!f.is_available})" 
+          class="text-[10px] font-bold px-2 py-1 rounded border transition ${
+            f.is_available 
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20' 
+              : 'bg-rose-500/10 text-rose-400 border-rose-500/30 hover:bg-rose-500/20'
+          }">
+          ${f.is_available ? 'In Stock' : 'Out of Stock'}
+        </button>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error('Error fetching flavors:', err);
+  }
+}
+
+// Toggle Flavor Stock Status
+async function toggleFlavorStock(flavorId, newStatus) {
+  try {
+    const { error } = await supabaseAdmin
+      .from('flavors')
+      .update({ is_available: newStatus })
+      .eq('id', flavorId);
+
+    if (error) throw error;
+    fetchAdminFlavors();
+  } catch (err) {
+    alert(`Failed to update stock: ${err.message}`);
+  }
+}
 
