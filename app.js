@@ -1,7 +1,6 @@
 // Supabase Configuration
 const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
-
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Application State
@@ -28,6 +27,19 @@ const orderForm = document.getElementById('order-form');
 const submitOrderBtn = document.getElementById('submit-order-btn');
 const checkoutError = document.getElementById('checkout-error');
 
+const trackModalBtn = document.getElementById('track-modal-btn');
+const trackModal = document.getElementById('track-modal');
+const trackCloseBtn = document.getElementById('track-close-btn');
+const popSound = document.getElementById('pop-sound');
+
+// Play Pop Sound Effect
+function playPop() {
+  if (popSound) {
+    popSound.currentTime = 0;
+    popSound.play().catch(() => {});
+  }
+}
+
 // Cart Drawer Visibility
 function toggleCart(open) {
   if (open) {
@@ -43,12 +55,15 @@ cartToggleBtn.addEventListener('click', () => toggleCart(true));
 cartCloseBtn.addEventListener('click', () => toggleCart(false));
 cartOverlay.addEventListener('click', () => toggleCart(false));
 
-// Modal Visibility
+// Tracking Modal Visibility
+if (trackModalBtn) trackModalBtn.addEventListener('click', () => trackModal.classList.remove('hidden'));
+if (trackCloseBtn) trackCloseBtn.addEventListener('click', () => trackModal.classList.add('hidden'));
+
+// Checkout Modal Visibility
 checkoutBtn.addEventListener('click', () => {
   toggleCart(false);
   checkoutModal.classList.remove('hidden');
 });
-
 modalCloseBtn.addEventListener('click', () => checkoutModal.classList.add('hidden'));
 
 // Flavor Filtering
@@ -65,6 +80,7 @@ function filterFlavors(category) {
   renderFlavors();
 }
 
+// Render Flavors with Bottle Pictures
 function renderFlavors() {
   const grid = document.getElementById('flavor-grid');
   const status = document.getElementById('status-indicator');
@@ -73,7 +89,7 @@ function renderFlavors() {
     ? menuFlavors 
     : menuFlavors.filter(f => f.category.toUpperCase() === activeCategory);
 
-  status.textContent = `${filtered.length} items shown`;
+  status.textContent = `${filtered.length} flavors shown`;
 
   if (filtered.length === 0) {
     grid.innerHTML = `<p class="text-zinc-400 col-span-full py-8 text-center">No flavors found in this category.</p>`;
@@ -81,19 +97,22 @@ function renderFlavors() {
   }
 
   grid.innerHTML = filtered.map(item => `
-    <div class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition duration-300 rounded-xl p-6 flex flex-col justify-between">
+    <div class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition duration-300 rounded-xl p-5 flex flex-col justify-between overflow-hidden group">
       <div>
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">${item.category}</span>
-          ${item.badge ? `<span class="text-xs font-bold text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">${item.badge}</span>` : ''}
+        <div class="w-full h-48 bg-zinc-950 rounded-lg mb-4 overflow-hidden flex items-center justify-center p-2 border border-zinc-800/80">
+          <img src="${item.image_url || 'images/jeera-lemon.jpg'}" alt="${item.name}" class="h-full object-contain group-hover:scale-105 transition duration-300" />
         </div>
-        <h3 class="text-xl font-bold mb-1">${item.name}</h3>
-        <p class="text-zinc-400 text-sm mb-4">${item.description || ''}</p>
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">${item.category}</span>
+          ${item.badge ? `<span class="text-[10px] font-bold text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">${item.badge}</span>` : ''}
+        </div>
+        <h3 class="text-lg font-bold mb-1 text-white">${item.name}</h3>
+        <p class="text-zinc-400 text-xs mb-4 line-clamp-2">${item.description || ''}</p>
       </div>
-      <div class="flex justify-between items-center pt-4 border-t border-zinc-800/60">
-        <span class="text-2xl font-black text-white">₹${item.price}</span>
-        <button onclick="addToCart(${item.id})" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-4 py-2 rounded-lg text-sm transition flex items-center gap-1">
-          + Add to Order
+      <div class="flex justify-between items-center pt-3 border-t border-zinc-800">
+        <span class="text-xl font-black text-white">₹${item.price}</span>
+        <button onclick="addToCart(${item.id})" class="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
+          + Add
         </button>
       </div>
     </div>
@@ -102,6 +121,7 @@ function renderFlavors() {
 
 // Cart State Operations
 function addToCart(flavorId) {
+  playPop();
   const item = menuFlavors.find(f => f.id === flavorId);
   if (!item) return;
 
@@ -168,36 +188,23 @@ function updateCartUI() {
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  const phoneInput = document.getElementById('cust-phone');
-  const phoneWarning = document.getElementById('phone-warning');
-  const phoneDigits = phoneInput.value.replace(/\D/g, '');
-
-  // Validate exactly 10 digits
-  if (phoneDigits.length !== 10) {
-    phoneWarning.classList.remove('hidden');
-    phoneInput.classList.add('border-amber-500');
-    return;
-  } else {
-    phoneWarning.classList.add('hidden');
-    phoneInput.classList.remove('border-amber-500');
-  }
-
   submitOrderBtn.disabled = true;
   submitOrderBtn.textContent = 'Submitting Order...';
   checkoutError.classList.add('hidden');
 
   const name = document.getElementById('cust-name').value;
+  const phone = document.getElementById('cust-phone').value;
   const address = document.getElementById('cust-address').value;
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const grandTotal = subtotal + (subtotal > 0 ? Math.round(subtotal * 0.05) : 0);
 
   try {
-    const { data, error } = await supabaseClient
+    const { error } = await supabaseClient
       .from('orders')
       .insert([{
         customer_name: name,
-        phone: phoneDigits,
+        phone: phone,
         address: address,
         items: cart,
         total_amount: grandTotal
@@ -205,6 +212,7 @@ orderForm.addEventListener('submit', async (e) => {
 
     if (error) throw error;
 
+    playPop();
     cart = [];
     updateCartUI();
     checkoutModal.classList.add('hidden');
@@ -221,29 +229,62 @@ orderForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Database Initialization
+// Live Order Tracking Search
+async function trackOrder() {
+  const input = document.getElementById('track-phone-input').value.trim();
+  const resultsDiv = document.getElementById('track-results');
+
+  if (!input) {
+    alert('Please enter a phone number to search.');
+    return;
+  }
+
+  resultsDiv.innerHTML = '<p class="text-xs text-zinc-400 animate-pulse">Searching live orders...</p>';
+  resultsDiv.classList.remove('hidden');
+
+  try {
+    const { data: orders, error } = await supabaseClient
+      .from('orders')
+      .select('*')
+      .ilike('phone', `%${input}%`)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!orders || orders.length === 0) {
+      resultsDiv.innerHTML = `<p class="text-xs text-amber-400 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">No orders found for this phone number.</p>`;
+      return;
+    }
+
+    resultsDiv.innerHTML = orders.map(o => `
+      <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 space-y-1">
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-xs text-emerald-400 font-bold">Order #${o.id}</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded ${o.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">${o.status}</span>
+        </div>
+        <p class="text-xs text-zinc-300 font-bold">Total: ₹${o.total_amount}</p>
+        <p class="text-[10px] text-zinc-500">${new Date(o.created_at).toLocaleString()}</p>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    resultsDiv.innerHTML = `<p class="text-xs text-red-400">Error: ${err.message}</p>`;
+  }
+}
+
+// Fetch Flavors
 async function fetchFlavors() {
   const status = document.getElementById('status-indicator');
 
   try {
-    const { data, error } = await supabaseClient
-      .from('flavors')
-      .select('*');
-
+    const { data, error } = await supabaseClient.from('flavors').select('*');
     if (error) throw error;
 
     menuFlavors = data || [];
     renderFlavors();
-
   } catch (err) {
     console.error('Database connection error:', err);
     status.textContent = 'Connection Error';
-    document.getElementById('flavor-grid').innerHTML = `
-      <div class="col-span-full bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
-        <p class="text-red-400 font-semibold mb-2">Failed to load flavors from database.</p>
-        <p class="text-xs text-zinc-400 font-mono">${err.message || 'Check console for details.'}</p>
-      </div>
-    `;
   }
 }
 
