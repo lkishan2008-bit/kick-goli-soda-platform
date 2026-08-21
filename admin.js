@@ -33,6 +33,32 @@ async function fetchAdminOrders() {
     if (statPending) statPending.textContent = pendingOrders;
     if (statRevenue) statRevenue.textContent = `₹${totalRev}`;
 
+    // Update Analytics Widget
+    const today = new Date().toDateString();
+    const todayOrders = allOrdersCache.filter(o => new Date(o.created_at).toDateString() === today);
+    const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+
+    const statTotalOrders = document.getElementById('stat-total-orders');
+    const statTotalRevenue = document.getElementById('stat-total-revenue');
+    const statTopFlavor = document.getElementById('stat-top-flavor');
+
+    if (statTotalOrders) statTotalOrders.textContent = todayOrders.length;
+    if (statTotalRevenue) statTotalRevenue.textContent = `₹${todayRevenue}`;
+
+    // Calculate top selling flavor from items arrays
+    if (statTopFlavor) {
+      const flavorCount = {};
+      allOrdersCache.forEach(o => {
+        if (Array.isArray(o.items)) {
+          o.items.forEach(item => {
+            flavorCount[item.name] = (flavorCount[item.name] || 0) + (item.quantity || 1);
+          });
+        }
+      });
+      const topFlavor = Object.entries(flavorCount).sort((a, b) => b[1] - a[1])[0];
+      statTopFlavor.textContent = topFlavor ? `${topFlavor[0]} 🍾` : '—';
+    }
+
     filterAdminOrders();
 
   } catch (err) {
@@ -177,3 +203,15 @@ async function toggleFlavorStock(flavorId, newStatus) {
   }
 }
 
+// Admin Store Toggle Handler
+const storeToggle = document.getElementById('store-online-toggle');
+const storeLabel = document.getElementById('store-status-label');
+
+storeToggle?.addEventListener('change', (e) => {
+  const isOnline = e.target.checked;
+  if (storeLabel) {
+    storeLabel.textContent = isOnline ? 'Store Online' : 'Store Offline';
+    storeLabel.className = isOnline ? 'font-semibold text-emerald-400' : 'font-semibold text-rose-400';
+  }
+  // Store state can be synced with Supabase settings table if needed
+});
