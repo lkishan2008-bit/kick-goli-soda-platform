@@ -1,3 +1,10 @@
+// Register PWA Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+  });
+}
+
 // Supabase Configuration
 const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
