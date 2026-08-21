@@ -207,14 +207,23 @@ async function toggleFlavorStock(flavorId, newStatus) {
 const storeToggle = document.getElementById('store-online-toggle');
 const storeLabel = document.getElementById('store-status-label');
 
-storeToggle?.addEventListener('change', (e) => {
+// Sync store state to Supabase from Admin
+storeToggle?.addEventListener('change', async (e) => {
   const isOnline = e.target.checked;
   localStorage.setItem('store_online', isOnline);
-  
+
   if (storeLabel) {
     storeLabel.textContent = isOnline ? 'Store Online' : 'Store Offline';
     storeLabel.className = isOnline ? 'font-semibold text-emerald-400' : 'font-semibold text-rose-400';
   }
+
+  // Update Supabase
+  const { error } = await supabaseAdmin
+    .from('store_settings')
+    .update({ is_online: isOnline, updated_at: new Date() })
+    .eq('id', 1);
+
+  if (error) console.error('Failed to update store status in Supabase:', error);
 });
 
 // Initialize toggle state from localStorage

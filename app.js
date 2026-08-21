@@ -35,9 +35,26 @@ function updateStoreState(isOnline) {
   }
 }
 
-// Read store state from localStorage (or Supabase settings table)
-const savedStoreState = localStorage.getItem('store_online') !== 'false';
-updateStoreState(savedStoreState);
+// Fetch store status on load and subscribe to real-time changes
+async function initStoreStatusListener() {
+  // Initial fetch
+  const { data } = await supabaseClient.from('store_settings').select('is_online').eq('id', 1).single();
+  if (data) {
+    updateStoreState(data.is_online);
+  }
+
+  // Real-time listener
+  supabaseClient
+    .channel('public:store_settings')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'store_settings' }, payload => {
+      if (payload.new) {
+        updateStoreState(payload.new.is_online);
+      }
+    })
+    .subscribe();
+}
+
+initStoreStatusListener();
 
 // UI Selectors
 const cartToggleBtn = document.getElementById('cart-toggle-btn');
