@@ -137,11 +137,18 @@ cartCloseBtn.addEventListener('click', () => toggleCart(false));
 cartOverlay.addEventListener('click', () => toggleCart(false));
 
 // Tracking Modal Controls
-if (trackBtn) {
-  trackBtn.addEventListener('click', () => trackingModal.classList.remove('hidden'));
+function openTrackOrderModal() {
+  trackingModal?.classList.remove('hidden');
 }
+
 if (closeTrackBtn) {
   closeTrackBtn.addEventListener('click', () => trackingModal.classList.add('hidden'));
+}
+
+// Toggle Profile Modal
+function toggleProfileModal() {
+  const modal = document.getElementById('profile-modal');
+  modal?.classList.toggle('hidden');
 }
 
 document.getElementById('search-track-btn')?.addEventListener('click', () => {
