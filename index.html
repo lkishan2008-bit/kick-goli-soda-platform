@@ -109,19 +109,17 @@
         </div>
       </div>
 
-      <!-- Interactive Soda Bottle Container -->
-      <div class="relative inline-block cursor-pointer group" onclick="popSodaBottle(this)">
+      <!-- Single Interactive Soda Bottle -->
+      <div class="relative inline-block cursor-pointer group select-none" onclick="popSodaBottle(this)">
         
         <!-- Carbonated Bubbles Container -->
-        <div id="bubble-container" class="absolute inset-0 overflow-hidden pointer-events-none z-10">
-          <!-- JS dynamically generates rising bubbles here -->
-        </div>
+        <div id="bubble-container" class="absolute inset-0 overflow-hidden pointer-events-none z-10"></div>
 
-        <!-- Hero Bottle Image -->
-        <img id="hero-soda-bottle" src="images/kick-goli-soda-bg.jpg" alt="Kick Goli Soda Bottle" class="w-full max-w-xs md:max-w-sm transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_10px_25px_rgba(16,185,129,0.3)] rounded-2xl" />
+        <!-- Hero Single Bottle Image -->
+        <img id="hero-soda-bottle" src="assets/single-goli-soda-bottle.png" alt="Kick Goli Soda Bottle" class="w-48 sm:w-64 md:w-72 mx-auto drop-shadow-[0_15px_30px_rgba(16,185,129,0.35)] transition-transform duration-300 group-hover:scale-105" />
 
         <!-- Tap Hint Badge -->
-        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-zinc-950 text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1 opacity-90 group-hover:scale-110 transition whitespace-nowrap">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-zinc-950 text-[10px] font-black px-3 py-1 rounded-full shadow-xl flex items-center gap-1 group-hover:scale-110 transition">
           💥 TAP TO POP!
         </div>
       </div>
@@ -129,8 +127,10 @@
     </div>
   </section>
 
-  <!-- Audio Element for Fizz & Pop -->
-  <audio id="soda-pop-sound" src="https://assets.mixkit.co/active_storage/sfx/2044/2044-preview.mp3" preload="auto"></audio>
+  <!-- Sound Effects Array -->
+  <audio id="soda-pop-1" src="https://assets.mixkit.co/active_storage/sfx/2044/2044-preview.mp3" preload="auto"></audio>
+  <audio id="soda-pop-2" src="https://assets.mixkit.co/active_storage/sfx/2043/2043-preview.mp3" preload="auto"></audio>
+  <audio id="soda-pop-3" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
   <!-- Brand Impact Section -->
   <section id="impact" class="py-16 px-4 max-w-6xl mx-auto border-y border-zinc-800/80 my-12">

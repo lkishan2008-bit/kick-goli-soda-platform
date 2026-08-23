@@ -117,35 +117,42 @@ function startCarbonationEffect() {
   }, 200);
 }
 
-// Trigger Fizz Pop Sound & Shake Animation on Click
+// Array of different pop audio IDs
+const popSounds = ['soda-pop-1', 'soda-pop-2', 'soda-pop-3'];
+
 function popSodaBottle(element) {
-  const audio = document.getElementById('soda-pop-sound');
-  const img = element.querySelector('img');
+  // Pick a random sound from the list
+  const randomSoundId = popSounds[Math.floor(Math.random() * popSounds.length)];
+  const audio = document.getElementById(randomSoundId);
 
   if (audio) {
     audio.currentTime = 0;
-    audio.play().catch(err => console.log('Audio autoplay prevented:', err));
+    audio.play().catch(err => console.log('Audio playback issue:', err));
   }
 
+  // Trigger bottle shake animation
+  const img = element.querySelector('img');
   if (img) {
     img.classList.remove('bottle-pop-animate');
-    void img.offsetWidth; // Force reflow
+    void img.offsetWidth; // Force CSS reflow
     img.classList.add('bottle-pop-animate');
   }
 
-  // Burst of extra bubbles on pop
+  // Burst carbonation bubbles upwards on click
   const container = document.getElementById('bubble-container');
   if (container) {
-    for (let i = 0; i < 12; i++) {
-      const burstBubble = document.createElement('div');
-      burstBubble.classList.add('bubble');
-      burstBubble.style.width = Math.random() * 10 + 6 + 'px';
-      burstBubble.style.height = burstBubble.style.width;
-      burstBubble.style.left = Math.random() * 80 + 10 + '%';
-      burstBubble.style.bottom = '20%';
-      burstBubble.style.animationDuration = '1s';
-      container.appendChild(burstBubble);
-      setTimeout(() => burstBubble.remove(), 1000);
+    for (let i = 0; i < 15; i++) {
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      const size = Math.random() * 10 + 4 + 'px';
+      bubble.style.width = size;
+      bubble.style.height = size;
+      bubble.style.left = Math.random() * 70 + 15 + '%';
+      bubble.style.bottom = '15%';
+      bubble.style.animationDuration = Math.random() * 0.8 + 0.7 + 's';
+      container.appendChild(bubble);
+
+      setTimeout(() => bubble.remove(), 1200);
     }
   }
 }
