@@ -88,6 +88,72 @@ function playPop() {
   }
 }
 
+// Generate Continuous Carbonation Bubbles inside the Bottle Area
+function startCarbonationEffect() {
+  const container = document.getElementById('bubble-container');
+  if (!container) return;
+
+  setInterval(() => {
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    
+    // Randomize size, starting horizontal position, and speed
+    const size = Math.random() * 8 + 4 + 'px';
+    const left = Math.random() * 80 + 10 + '%';
+    const duration = Math.random() * 1.5 + 1.5 + 's';
+
+    bubble.style.width = size;
+    bubble.style.height = size;
+    bubble.style.left = left;
+    bubble.style.bottom = '10%';
+    bubble.style.animationDuration = duration;
+
+    container.appendChild(bubble);
+
+    // Clean up bubble element after animation ends
+    setTimeout(() => {
+      bubble.remove();
+    }, 2500);
+  }, 200);
+}
+
+// Trigger Fizz Pop Sound & Shake Animation on Click
+function popSodaBottle(element) {
+  const audio = document.getElementById('soda-pop-sound');
+  const img = element.querySelector('img');
+
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play().catch(err => console.log('Audio autoplay prevented:', err));
+  }
+
+  if (img) {
+    img.classList.remove('bottle-pop-animate');
+    void img.offsetWidth; // Force reflow
+    img.classList.add('bottle-pop-animate');
+  }
+
+  // Burst of extra bubbles on pop
+  const container = document.getElementById('bubble-container');
+  if (container) {
+    for (let i = 0; i < 12; i++) {
+      const burstBubble = document.createElement('div');
+      burstBubble.classList.add('bubble');
+      burstBubble.style.width = Math.random() * 10 + 6 + 'px';
+      burstBubble.style.height = burstBubble.style.width;
+      burstBubble.style.left = Math.random() * 80 + 10 + '%';
+      burstBubble.style.bottom = '20%';
+      burstBubble.style.animationDuration = '1s';
+      container.appendChild(burstBubble);
+      setTimeout(() => burstBubble.remove(), 1000);
+    }
+  }
+}
+
+// Initialize Carbonation on Page Load
+document.addEventListener('DOMContentLoaded', startCarbonationEffect);
+
+
 // Toast Notifications
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
