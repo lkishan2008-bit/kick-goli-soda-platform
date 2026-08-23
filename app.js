@@ -381,6 +381,8 @@ async function submitOrder() {
     playPop();
     const createdOrder = (data && data.length > 0) ? data[0] : orderPayload;
 
+    saveUserProfile(name, phone, address);
+
     showOrderReceipt(createdOrder);
     cart = [];
     window.currentOrderUTR = null;
@@ -496,3 +498,31 @@ document.getElementById('float-checkout-btn')?.addEventListener('click', () => {
   const mainCartBtn = document.getElementById('cart-toggle-btn');
   mainCartBtn?.click();
 });
+
+// Save user profile details to localStorage on checkout
+function saveUserProfile(name, phone, address) {
+  const profile = { name, phone, address };
+  localStorage.setItem('kick_user_profile', JSON.stringify(profile));
+  renderUserProfile();
+}
+
+// Render profile info in Nav and Modal
+function renderUserProfile() {
+  const saved = localStorage.getItem('kick_user_profile');
+  if (!saved) return;
+
+  const { name, phone, address } = JSON.parse(saved);
+  
+  // Update Header Greeting
+  const navGreeting = document.getElementById('nav-user-greeting');
+  if (navGreeting && name) navGreeting.textContent = `Hello, ${name.split(' ')[0]}`;
+
+  // Update Profile Modal Fields
+  const profileName = document.getElementById('profile-name');
+  const profilePhone = document.getElementById('profile-phone');
+  if (profileName) profileName.textContent = name || 'Goli Soda Fan';
+  if (profilePhone) profilePhone.textContent = phone || '+91 96204 16948';
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', renderUserProfile);

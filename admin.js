@@ -121,9 +121,12 @@ function renderOrdersTable(orders) {
             ${o.status || 'Preparing'}
           </span>
         </td>
-        <td class="px-4 py-3 text-right">
+        <td class="px-4 py-3 text-right flex justify-end gap-2">
           <button onclick="updateOrderStatus(${o.id}, '${isDelivered ? 'Preparing' : 'Delivered'}')" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold px-2.5 py-1 rounded border border-zinc-700 transition">
             Mark ${isDelivered ? 'Pending' : 'Delivered'}
+          </button>
+          <button onclick="printOrderById(${o.id})" class="text-xs bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-2.5 py-1 rounded transition">
+            🖨️ Print
           </button>
         </td>
       </tr>
@@ -151,6 +154,24 @@ fetchAdminFlavors();
 
 // Auto-refresh every 15 seconds
 setInterval(fetchAdminOrders, 15000);
+
+// Play audio when a new row is inserted into 'orders'
+function playOrderChime() {
+  const audio = document.getElementById('order-sound');
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play().catch(err => console.log('Audio autoplay prevented by browser:', err));
+  }
+}
+
+// Listen for new orders in real-time
+supabaseAdmin
+  .channel('public:orders')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
+    playOrderChime();
+    fetchAdminOrders(); // Auto-refresh table for the new order
+  })
+  .subscribe();
 
 // Fetch & Render Flavor Stock Status
 async function fetchAdminFlavors() {
@@ -230,4 +251,46 @@ storeToggle?.addEventListener('change', async (e) => {
 if (storeToggle && localStorage.getItem('store_online') === 'false') {
   storeToggle.checked = false;
   storeToggle.dispatchEvent(new Event('change'));
+}
+
+// Print helper
+function printOrderById(orderId) {
+  const order = allOrdersCache.find(o => o.id === orderId);
+  if (order) printReceipt(order);
+}
+
+// Print Order Receipt Slip
+function printReceipt(order) {
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Receipt #${order.id} - Kick Goli Soda</title>
+        <style>
+          body { font-family: monospace; padding: 20px; width: 300px; }
+          .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+          .item { display: flex; justify-content: space-between; margin: 5px 0; }
+          .total { border-top: 1px dashed #000; margin-top: 10px; padding-top: 10px; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h3>KICK GOLI SODA</h3>
+          <p>Vibhin Enterprises, Ajjampura</p>
+          <p>Order ID: #${order.id}</p>
+        </div>
+        <div>
+          <p><strong>Customer:</strong> ${order.customer_name || 'Guest'}</p>
+          <p><strong>Phone:</strong> ${order.phone || 'N/A'}</p>
+          <p><strong>Address:</strong> ${order.address || 'Ajjampura'}</p>
+        </div>
+        <hr/>
+        <div class="total">
+          <p>Total Amount: ₹${order.total_amount}</p>
+        </div>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
 }
