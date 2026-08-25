@@ -233,16 +233,17 @@ function toggleProfileModal() {
 
 /** Sign in with Google via Supabase OAuth redirect */
 async function signInWithGoogle() {
-  const redirectTarget = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3000'
-    : window.location.origin + window.location.pathname;
+  const redirectUrl = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : window.location.origin;
 
   const { data, error } = await _supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: redirectTarget
+      redirectTo: redirectUrl
     }
   });
+
   if (error) {
     console.error('Error logging in:', error.message);
     showToast('Error logging in: ' + error.message, 'error');
