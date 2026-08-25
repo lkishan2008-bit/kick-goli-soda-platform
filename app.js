@@ -9,11 +9,16 @@ if ('serviceWorker' in navigator) {
 const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _supabase = supabaseClient; // Alias for _supabase
+window._supabase = _supabase;
+
 
 // Application State
 let cart = [];
 let menuFlavors = [];
 let activeCategory = 'All';
+let currentUser = null; // Supabase auth user object
+
 
 // Store Availability State Listener
 function updateStoreState(isOnline) {
@@ -223,6 +228,136 @@ function toggleProfileModal() {
   const modal = document.getElementById('profile-modal');
   modal?.classList.toggle('hidden');
 }
+
+// ─── GOOGLE AUTH (Supabase OAuth) ─────────────────────────────────────────────
+
+/** Sign in with Google via Supabase OAuth redirect */
+async function signInWithGoogle() {
+  const redirectTarget = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : window.location.origin + window.location.pathname;
+
+  const { data, error } = await _supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectTarget
+    }
+  });
+  if (error) {
+    console.error('Error logging in:', error.message);
+    showToast('Error logging in: ' + error.message, 'error');
+  }
+}
+
+/** Sign out the current Supabase session */
+async function signOutUser() {
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) {
+    showToast('Sign out failed: ' + error.message, 'error');
+  } else {
+    currentUser = null;
+    renderAuthButton(null);
+    showToast('Signed out successfully.');
+    // Close profile modal if open
+    document.getElementById('profile-modal')?.classList.add('hidden');
+    // Also close dropdown
+    document.getElementById('auth-dropdown')?.remove();
+  }
+}
+
+/**
+ * Render the navbar auth button based on session state.
+ * @param {object|null} user - Supabase user object or null if logged out
+ */
+function renderAuthButton(user) {
+  const container = document.getElementById('auth-container');
+  if (!container) return;
+
+  if (!user) {
+    // ── Logged-out: Google Sign-In pill ──
+    container.innerHTML = `
+      <button
+        id="google-login-btn"
+        onclick="signInWithGoogle()"
+        class="flex items-center gap-2 bg-white text-zinc-950 px-3 py-1.5 rounded-xl font-bold text-xs hover:bg-zinc-200 transition shadow-md"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+    `;
+  } else {
+    // ── Logged-in: Avatar + first name + dropdown toggle ──
+    const avatarUrl = user.user_metadata?.avatar_url || '';
+    const firstName  = (user.user_metadata?.full_name || user.email || 'User').split(' ')[0];
+    const avatarHTML = avatarUrl
+      ? `<img src="${avatarUrl}" alt="avatar" class="w-6 h-6 rounded-full object-cover border border-emerald-500/40">`
+      : `<span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xs font-bold">${firstName[0].toUpperCase()}</span>`;
+
+    container.innerHTML = `
+      <button
+        id="user-auth-btn"
+        onclick="toggleAuthDropdown()"
+        class="flex flex-col items-start hover:text-emerald-400 text-zinc-300 transition text-left"
+      >
+        <span class="text-[10px] text-zinc-400">Signed in as</span>
+        <span class="font-bold flex items-center gap-1.5">
+          ${avatarHTML}
+          ${firstName}
+          <svg class="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </span>
+      </button>
+      <div id="auth-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden z-50">
+        <button onclick="toggleProfileModal(); toggleAuthDropdown()" class="w-full flex items-center gap-2 px-4 py-3 text-xs text-zinc-200 hover:bg-zinc-800 transition text-left">
+          <span>👤</span> My Profile
+        </button>
+        <div class="border-t border-zinc-800"></div>
+        <button onclick="signOutUser()" class="w-full flex items-center gap-2 px-4 py-3 text-xs text-rose-400 hover:bg-rose-500/10 transition text-left">
+          <span>↩️</span> Sign Out
+        </button>
+      </div>
+    `;
+  }
+}
+
+/** Toggle the sign-in dropdown visible/hidden */
+function toggleAuthDropdown() {
+  const dropdown = document.getElementById('auth-dropdown');
+  if (!dropdown) return;
+  dropdown.classList.toggle('hidden');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const container = document.getElementById('auth-container');
+  if (container && !container.contains(e.target)) {
+    document.getElementById('auth-dropdown')?.classList.add('hidden');
+  }
+});
+
+// ── Supabase Auth State Listener ─────────────────────────────────────────────
+supabaseClient.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
+  renderAuthButton(currentUser);
+  renderUserProfile();
+});
+
+// Bootstrap auth on page load
+async function initAuth() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  currentUser = session?.user || null;
+  renderAuthButton(currentUser);
+  renderUserProfile();
+}
+
+initAuth();
+document.addEventListener('DOMContentLoaded', initAuth);
+// ─────────────────────────────────────────────────────────────────────────────
+
 
 document.getElementById('search-track-btn')?.addEventListener('click', () => {
   const query = document.getElementById('track-input').value.trim();
@@ -581,21 +716,39 @@ function saveUserProfile(name, phone, address) {
 
 // Render profile info in Nav and Modal
 function renderUserProfile() {
-  const saved = localStorage.getItem('kick_user_profile');
-  if (!saved) return;
-
-  const { name, phone, address } = JSON.parse(saved);
-  
-  // Update Header Greeting
-  const navGreeting = document.getElementById('nav-user-greeting');
-  if (navGreeting && name) navGreeting.textContent = `Hello, ${name.split(' ')[0]}`;
-
-  // Update Profile Modal Fields
   const profileName = document.getElementById('profile-name');
   const profilePhone = document.getElementById('profile-phone');
-  if (profileName) profileName.textContent = name || 'Goli Soda Fan';
-  if (profilePhone) profilePhone.textContent = phone || '+91 96204 16948';
+  const profileAvatar = document.getElementById('profile-avatar-wrapper');
+  const modalSignOutBtn = document.getElementById('profile-modal-signout-btn');
+  const custNameInput = document.getElementById('cust-name');
+
+  const saved = localStorage.getItem('kick_user_profile');
+  const localProfile = saved ? JSON.parse(saved) : {};
+
+  if (currentUser) {
+    const fullName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || localProfile.name || 'Goli Soda Fan';
+    const emailOrPhone = currentUser.email || localProfile.phone || '';
+    const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture;
+
+    if (profileName) profileName.textContent = fullName;
+    if (profilePhone) profilePhone.textContent = emailOrPhone;
+    if (profileAvatar) {
+      profileAvatar.innerHTML = avatarUrl 
+        ? `<img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover rounded-full" />`
+        : `<span>👤</span>`;
+    }
+    if (modalSignOutBtn) modalSignOutBtn.classList.remove('hidden');
+    if (custNameInput && !custNameInput.value && fullName !== 'Goli Soda Fan') {
+      custNameInput.value = fullName;
+    }
+  } else {
+    if (profileName) profileName.textContent = localProfile.name || 'Goli Soda Fan';
+    if (profilePhone) profilePhone.textContent = localProfile.phone || '+91 96204 16948';
+    if (profileAvatar) profileAvatar.innerHTML = '👤';
+    if (modalSignOutBtn) modalSignOutBtn.classList.add('hidden');
+  }
 }
 
 // Run on page load
 document.addEventListener('DOMContentLoaded', renderUserProfile);
+

@@ -61,11 +61,8 @@
           <span class="font-bold flex items-center gap-1">📦 Orders</span>
         </button>
 
-        <!-- User Profile / Account Button -->
-        <button onclick="toggleProfileModal()" class="flex flex-col items-start hover:text-emerald-400 text-zinc-300 transition text-left">
-          <span class="text-[10px] text-zinc-400" id="nav-user-greeting">Hello, Guest</span>
-          <span class="font-bold flex items-center gap-1">👤 Account & Profile</span>
-        </button>
+        <!-- Dynamic Auth Button (populated by app.js based on Supabase auth state) -->
+        <div id="auth-container" class="relative"></div>
 
         <!-- Cart Button with Counter -->
         <button id="cart-toggle-btn" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl transition font-bold">
@@ -388,7 +385,7 @@
       <button onclick="toggleProfileModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white">✕</button>
       
       <div class="flex items-center gap-4 mb-6">
-        <div class="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl text-emerald-400 font-bold">
+        <div id="profile-avatar-wrapper" class="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl text-emerald-400 font-bold overflow-hidden">
           👤
         </div>
         <div>
@@ -406,6 +403,10 @@
           <span class="text-zinc-400">Total Orders Placed</span>
           <span class="text-emerald-400 font-bold" id="profile-order-count">0</span>
         </div>
+        <!-- Sign Out inside profile modal (shown only when logged in) -->
+        <button id="profile-modal-signout-btn" onclick="signOutUser()" class="hidden w-full mt-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold py-2.5 rounded-xl text-xs transition">
+          Sign Out
+        </button>
       </div>
     </div>
   </div>

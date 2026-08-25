@@ -21,3 +21,40 @@
 #checkout-modal, #cart-overlay {
   transition: opacity 0.2s ease-in-out;
 }
+
+/* Carbonation Bubbles Floating Up */
+@keyframes rise {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: rise 2.5s infinite ease-in;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+/* Bottle Click Shake Effect */
+@keyframes pop-shake {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.08) rotate(-3deg); }
+  40% { transform: scale(1.08) rotate(3deg); }
+  60% { transform: scale(1.05) rotate(-2deg); }
+  100% { transform: scale(1); }
+}
+
+.bottle-pop-animate {
+  animation: pop-shake 0.4s ease-out;
+}
