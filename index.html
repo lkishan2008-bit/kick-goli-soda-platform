@@ -411,6 +411,50 @@
     </div>
   </div>
 
+  <!-- Auth Modal -->
+  <div id="authModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl relative text-white">
+      <button onclick="document.getElementById('authModal').classList.add('hidden')" class="absolute top-3 right-4 text-zinc-400 hover:text-white text-xl font-bold">&times;</button>
+      
+      <div class="text-center mb-5">
+        <div class="w-10 h-10 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-center text-xl mx-auto mb-2">
+          🍾
+        </div>
+        <h2 class="text-lg font-black text-white" id="modalTitle">Account Login</h2>
+        <p class="text-xs text-zinc-400 mt-0.5">Enter your email and password below</p>
+      </div>
+      
+      <div class="space-y-3">
+        <input 
+          type="email" 
+          id="authEmail" 
+          placeholder="Email Address" 
+          class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition" 
+        />
+        <input 
+          type="password" 
+          id="authPassword" 
+          placeholder="Password (min 6 chars)" 
+          class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition" 
+        />
+        
+        <button 
+          onclick="signInUser(document.getElementById('authEmail').value, document.getElementById('authPassword').value)" 
+          class="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 py-2.5 rounded-xl font-black text-xs transition shadow-lg shadow-emerald-500/20"
+        >
+          Sign In
+        </button>
+        
+        <button 
+          onclick="signUpUser(document.getElementById('authEmail').value, document.getElementById('authPassword').value)" 
+          class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2.5 rounded-xl font-bold text-xs transition border border-zinc-700"
+        >
+          Create New Account
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Dedicated Contact & Support Section -->
   <section id="contact" class="bg-zinc-950 border-t border-zinc-800 py-12 px-4 mt-16">
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
