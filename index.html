@@ -106,18 +106,36 @@
         </div>
       </div>
 
-      <!-- Single Interactive Soda Bottle -->
-      <div class="relative inline-block cursor-pointer group select-none" onclick="popSodaBottle(this)">
+      <!-- Single Hero Kick Goli Soda Pop Card -->
+      <div class="relative flex flex-col items-center justify-center p-6 bg-zinc-900 rounded-2xl border border-emerald-500/30 shadow-2xl max-w-sm mx-auto my-8">
         
-        <!-- Carbonated Bubbles Container -->
-        <div id="bubble-container" class="absolute inset-0 overflow-hidden pointer-events-none z-10"></div>
+        <!-- Tap to Pop Button -->
+        <button onclick="popSodaBottle()" class="mb-4 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-full shadow-lg transition transform active:scale-95 flex items-center gap-2">
+          <span>💥</span> TAP TO POP!
+        </button>
 
-        <!-- Hero Single Bottle Image -->
-        <img id="hero-soda-bottle" src="images/kick-goli-soda-bg.jpg" alt="Kick Goli Soda Bottle" class="w-48 sm:w-64 md:w-72 mx-auto drop-shadow-[0_15px_30px_rgba(16,185,129,0.35)] transition-transform duration-300 group-hover:scale-105 rounded-2xl border border-emerald-500/30 object-cover" />
+        <!-- Interactive Single Bottle Container -->
+        <div id="bottleContainer" class="relative cursor-pointer transition transform duration-300 hover:scale-105" onclick="popSodaBottle()">
+          
+          <!-- Pop Fizz Burst Overlay -->
+          <div id="fizzEffect" class="hidden absolute -top-12 left-1/2 -translate-x-1/2 text-4xl animate-bounce z-10 font-extrabold text-emerald-400 drop-shadow-lg select-none">
+            FIZZZ ✨🍾💥
+          </div>
+          
+          <!-- Carbonated Bubble Emitter Container -->
+          <div id="bubble-container" class="absolute inset-0 overflow-hidden pointer-events-none rounded-xl z-10"></div>
+          
+          <!-- Single Hero Kick Goli Soda Bottle -->
+          <img id="sodaBottle" src="images/paneer-soda.jpg" alt="Kick Goli Soda Single Bottle" class="h-80 object-contain rounded-xl border border-zinc-700 shadow-xl">
+        </div>
 
-        <!-- Tap Hint Badge -->
-        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-zinc-950 text-[10px] font-black px-3 py-1 rounded-full shadow-xl flex items-center gap-1 group-hover:scale-110 transition">
-          💥 TAP TO POP!
+        <!-- Quick Order Details -->
+        <div class="mt-6 text-center w-full">
+          <h3 class="text-xl font-bold text-white mb-1">Kick Goli Soda</h3>
+          <p class="text-emerald-400 font-semibold mb-4">₹40 / bottle</p>
+          <button onclick="checkoutOrder('Kick Goli Soda', 40)" class="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 rounded-xl font-bold shadow-md transition transform active:scale-95">
+            Buy Now & Checkout
+          </button>
         </div>
       </div>
 
