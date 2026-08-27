@@ -526,6 +526,13 @@
     </button>
   </div>
 
+  <!-- Floating Mini Cart Button -->
+  <button onclick="openCheckoutModal()" class="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm rounded-full shadow-lg shadow-emerald-500/20 transition transform active:scale-95">
+    <span>🍾</span>
+    <span>Checkout</span>
+    <span id="cart-badge" class="bg-zinc-950 text-emerald-400 text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
+  </button>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 

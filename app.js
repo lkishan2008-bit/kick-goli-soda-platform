@@ -265,7 +265,7 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-// Cart Drawer Visibility
+// Cart Drawer & Modal Controls
 function toggleCart(open) {
   if (open) {
     cartOverlay.classList.remove('hidden');
@@ -274,6 +274,11 @@ function toggleCart(open) {
     cartOverlay.classList.add('hidden');
     cartDrawer.classList.add('translate-x-full');
   }
+}
+
+/** Open checkout drawer/modal directly */
+function openCheckoutModal() {
+  toggleCart(true);
 }
 
 cartToggleBtn.addEventListener('click', () => toggleCart(true));
@@ -664,8 +669,10 @@ function updateCartUI() {
   const taxes = subtotal > 0 ? Math.round(subtotal * 0.05) : 0;
   const grandTotal = subtotal + taxes;
 
-  cartCountBadge.textContent = totalCount;
-  cartDrawerCount.textContent = `${totalCount} item${totalCount === 1 ? '' : 's'}`;
+  if (cartCountBadge) cartCountBadge.textContent = totalCount;
+  const miniCartBadge = document.getElementById('cart-badge');
+  if (miniCartBadge) miniCartBadge.textContent = totalCount;
+  if (cartDrawerCount) cartDrawerCount.textContent = `${totalCount} item${totalCount === 1 ? '' : 's'}`;
   
   cartSubtotal.textContent = `₹${subtotal}`;
   cartTaxes.textContent = `₹${taxes}`;
