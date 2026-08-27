@@ -431,12 +431,23 @@
           placeholder="Email Address" 
           class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition" 
         />
-        <input 
-          type="password" 
-          id="authPassword" 
-          placeholder="Password (min 6 chars)" 
-          class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition" 
-        />
+        <div class="relative">
+          <input 
+            type="password" 
+            id="authPassword" 
+            placeholder="Password (min 6 chars)" 
+            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition" 
+          />
+          <button 
+            type="button" 
+            id="togglePasswordBtn" 
+            onclick="togglePasswordVisibility()" 
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs transition select-none"
+            title="Show/Hide Password"
+          >
+            👁️
+          </button>
+        </div>
         
         <button 
           onclick="signInUser(document.getElementById('authEmail').value, document.getElementById('authPassword').value)" 

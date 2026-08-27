@@ -245,8 +245,28 @@ function closeAuthModal() {
   modal?.classList.add('hidden');
   const emailInput = document.getElementById('authEmail') || document.getElementById('auth-email');
   const passInput = document.getElementById('authPassword') || document.getElementById('auth-password');
+  const toggleBtn = document.getElementById('togglePasswordBtn');
   if (emailInput) emailInput.value = '';
-  if (passInput) passInput.value = '';
+  if (passInput) {
+    passInput.value = '';
+    passInput.type = 'password';
+  }
+  if (toggleBtn) toggleBtn.textContent = '👁️';
+}
+
+/** Toggle auth password field visibility between text and password */
+function togglePasswordVisibility() {
+  const passInput = document.getElementById('authPassword') || document.getElementById('auth-password');
+  const toggleBtn = document.getElementById('togglePasswordBtn');
+  if (!passInput) return;
+
+  if (passInput.type === 'password') {
+    passInput.type = 'text';
+    if (toggleBtn) toggleBtn.textContent = '🙈';
+  } else {
+    passInput.type = 'password';
+    if (toggleBtn) toggleBtn.textContent = '👁️';
+  }
 }
 
 /** Switch modal between 'signin' and 'signup' modes */
@@ -308,10 +328,26 @@ async function handleAuthSubmit(e) {
   }
 }
 
+// Validate email format
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 // Sign Up Handler
 async function signUpUser(email, password) {
   if (!email || !password) {
     showToast('Please enter both email and password', 'error');
+    return;
+  }
+
+  if (!isValidEmail(email)) {
+    showToast("Please enter a proper email address (e.g., name@domain.com)", "error");
+    return;
+  }
+
+  if (password.length < 6) {
+    showToast("Password must be at least 6 characters long", "error");
     return;
   }
 
@@ -322,9 +358,9 @@ async function signUpUser(email, password) {
 
   if (error) {
     console.error('Sign up error:', error.message);
-    showToast('Sign up failed: ' + error.message, 'error');
+    showToast(`Sign up failed: ${error.message}`, "error");
   } else {
-    showToast('Success! Check your email for confirmation.', 'success');
+    showToast("Account created successfully! You can now Sign In.", "success");
     closeAuthModal();
   }
 }
