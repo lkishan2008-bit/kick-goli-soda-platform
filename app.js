@@ -125,26 +125,39 @@ function startCarbonationEffect() {
 // Array of different pop audio IDs
 const popSounds = ['soda-pop-1', 'soda-pop-2', 'soda-pop-3'];
 
+// Pop Bottle Animation Logic
 function popSodaBottle(element) {
-  // Pick a random sound from the list
+  const bottle = (element && element.querySelector ? element.querySelector('img') : null) || 
+                 document.getElementById('sodaBottle') || 
+                 document.getElementById('hero-soda-bottle');
+  const fizz = document.getElementById('fizzEffect');
+
+  // Trigger sound
   const randomSoundId = popSounds[Math.floor(Math.random() * popSounds.length)];
   const audio = document.getElementById(randomSoundId);
-
   if (audio) {
     audio.currentTime = 0;
     audio.play().catch(err => console.log('Audio playback issue:', err));
   }
 
-  // Trigger bottle shake animation
-  const img = element.querySelector('img');
-  if (img) {
-    img.classList.remove('bottle-pop-animate');
-    void img.offsetWidth; // Force CSS reflow
-    img.classList.add('bottle-pop-animate');
+  // Trigger Fizz particles
+  if (fizz) {
+    fizz.classList.remove('hidden');
+    setTimeout(() => {
+      fizz.classList.add('hidden');
+    }, 1200);
   }
 
-  // Burst carbonation bubbles upwards on click
-  const container = document.getElementById('bubble-container');
+  // Shake / Ping animation
+  if (bottle) {
+    bottle.classList.add('animate-ping');
+    setTimeout(() => {
+      bottle.classList.remove('animate-ping');
+    }, 300);
+  }
+
+  // Burst carbonation bubbles upwards
+  const container = document.getElementById('bubble-container') || document.getElementById('bottleContainer');
   if (container) {
     for (let i = 0; i < 15; i++) {
       const bubble = document.createElement('div');
@@ -158,6 +171,59 @@ function popSodaBottle(element) {
       container.appendChild(bubble);
 
       setTimeout(() => bubble.remove(), 1200);
+    }
+  }
+}
+
+// Order & Supabase Checkout Function
+async function checkoutOrder(flavor, price) {
+  // Support both currentUser and Supabase v2 getUser()
+  let userEmail = "guest@kickgolisoda.com";
+  try {
+    if (currentUser?.email) {
+      userEmail = currentUser.email;
+    } else if (_supabase?.auth?.getUser) {
+      const { data } = await _supabase.auth.getUser();
+      if (data?.user?.email) userEmail = data.user.email;
+    }
+  } catch (e) {
+    console.warn('User session check skipped:', e);
+  }
+
+  popSodaBottle();
+
+  try {
+    const response = await fetch('http://localhost:5000/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_email: userEmail,
+        flavor: flavor,
+        quantity: 1,
+        total_price: price
+      })
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      if (typeof showToast === 'function') {
+        showToast(`🎉 Order Confirmed! Enjoy your ${flavor}.`, 'success');
+      } else {
+        alert(`🎉 Order Confirmed! Enjoy your ${flavor}.`);
+      }
+    } else {
+      if (typeof showToast === 'function') {
+        showToast(`Error: ${result.error}`, 'error');
+      } else {
+        alert(`Error: ${result.error}`);
+      }
+    }
+  } catch (err) {
+    console.error("Checkout failed:", err);
+    if (typeof showToast === 'function') {
+      showToast('Checkout failed: Could not connect to order server.', 'error');
+    } else {
+      alert("Checkout failed: Could not connect to order server.");
     }
   }
 }
