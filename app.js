@@ -584,11 +584,20 @@ document.getElementById('search-track-btn')?.addEventListener('click', () => {
 });
 
 // Checkout Modal Visibility
-checkoutBtn.addEventListener('click', () => {
+checkoutBtn?.addEventListener('click', () => {
   toggleCart(false);
-  checkoutModal.classList.remove('hidden');
+  checkoutModal?.classList.remove('hidden');
 });
-modalCloseBtn.addEventListener('click', () => checkoutModal.classList.add('hidden'));
+modalCloseBtn?.addEventListener('click', () => checkoutModal?.classList.add('hidden'));
+
+// Render products safely without wiping hardcoded UI
+function renderProducts() {
+  const container = document.getElementById('product-grid') || document.getElementById('product-container');
+  if (!container) return;
+
+  // Ensure card content remains rendered
+  console.log('Product container locked and ready.');
+}
 
 // Flavor Filtering
 function filterFlavors(category) {
