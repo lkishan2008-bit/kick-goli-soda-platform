@@ -5,14 +5,15 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Supabase Initialization
-const SUPABASE_URL = 'https://ukkhhmjblzyuazumqpt.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xw9zPwzWtqGn86_Q_TA0_FNrn';
-
-// Initialize single Supabase instance safely
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-const supabase = supabaseClient;
-const _supabase = supabaseClient;
+// Ensure we don't re-declare supabase if already initialized
+if (typeof supabase === 'undefined') {
+  var supabase = window.supabase ? window.supabase.createClient(
+    'https://ukkhhmjblzyuazumqpt.supabase.co',
+    'sb_publishable_u0xqV1xw9zPwzWtqGn86_Q_TA0_FNrn'
+  ) : null;
+}
+var supabaseClient = supabase;
+var _supabase = supabase;
 window._supabase = _supabase;
 window.supabaseClient = supabaseClient;
 
