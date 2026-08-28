@@ -5,17 +5,17 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Ensure we don't re-declare supabase if already initialized
-if (typeof supabase === 'undefined') {
-  var supabase = window.supabase ? window.supabase.createClient(
-    'https://ukkhhmjblzyuazumqpt.supabase.co',
-    'sb_publishable_u0xqV1xw9zPwzWtqGn86_Q_TA0_FNrn'
-  ) : null;
-}
-var supabaseClient = supabase;
-var _supabase = supabase;
-window._supabase = _supabase;
+// 1. Safe Supabase Client Init
+const SUPABASE_URL = 'https://ukkhhmjblzyuazumqpt.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xw9zPwzWtqGn86_Q_TA0_FNrn';
+
+const supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function')
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+const supabase = supabaseClient;
 window.supabaseClient = supabaseClient;
+window._supabase = supabaseClient;
 
 
 // Application State
@@ -45,9 +45,12 @@ function updateStoreState(isOnline) {
   }
 }
 
-// Fetch store status on load and subscribe to real-time changes
+// 2. Safe Store Status Listener
 async function initStoreStatusListener() {
-  if (!supabaseClient) return;
+  if (!supabaseClient || typeof supabaseClient.from !== 'function') {
+    console.warn('Supabase client not initialized properly.');
+    return;
+  }
 
   // Initial fetch
   const { data } = await supabaseClient.from('store_settings').select('is_online').eq('id', 1).single();
@@ -563,10 +566,13 @@ supabaseClient?.auth?.onAuthStateChange((_event, session) => {
   renderUserProfile();
 });
 
-// Bootstrap auth on page load
+// 3. Safe Auth Init
 async function initAuth() {
-  if (!supabaseClient) return;
-  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!supabase?.auth) {
+    console.warn('Supabase auth unavailable.');
+    return;
+  }
+  const { data: { session } } = await supabase.auth.getSession();
   currentUser = session?.user || null;
   renderAuthButton(currentUser);
   renderUserProfile();
@@ -936,9 +942,15 @@ async function trackOrder() {
   }
 }
 
-// Fetch Flavors
+// 4. Safe Flavor Text Update
 async function fetchFlavors() {
+  if (!supabaseClient || typeof supabaseClient.from !== 'function') return;
+
   const status = document.getElementById('status-indicator');
+  const textElement = document.getElementById('flavor-count-text');
+  if (textElement) {
+    textElement.textContent = '7 Authentic Flavors';
+  }
 
   try {
     const { data, error } = await supabaseClient.from('flavors').select('*');
@@ -948,7 +960,7 @@ async function fetchFlavors() {
     renderFlavors(menuFlavors);
   } catch (err) {
     console.error('Database connection error:', err);
-    status.textContent = 'Connection Error';
+    if (status) status.textContent = 'Connection Error';
   }
 }
 
