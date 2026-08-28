@@ -651,28 +651,45 @@ function renderFlavors(flavors) {
     return;
   }
 
-  container.innerHTML = flavors.map(flavor => `
-    <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/50 transition duration-300 shadow-xl backdrop-blur-sm group">
-      <div>
-        <div class="relative overflow-hidden rounded-xl mb-4 bg-zinc-950 aspect-square flex items-center justify-center">
-          <img src="${flavor.image_url || ''}" alt="${flavor.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-          <span class="absolute top-2 right-2 bg-zinc-950/80 border border-zinc-800 text-emerald-400 font-black text-xs px-2.5 py-1 rounded-lg backdrop-blur-md">
+  container.innerHTML = flavors.map(flavor => {
+    const primaryImg = flavor.image_url || flavor.fallback_image || '';
+    const fallbackImg = flavor.fallback_image || 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80';
+
+    return `
+      <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-emerald-500/50 transition duration-300 shadow-xl backdrop-blur-sm group">
+        <div class="relative h-48 w-full bg-zinc-950 overflow-hidden">
+          <img
+            src="${primaryImg}"
+            onerror="this.onerror=null; this.src='${fallbackImg}';"
+            alt="${flavor.name}"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <span class="absolute top-3 right-3 bg-zinc-950/80 border border-zinc-800 text-emerald-400 font-black text-xs px-2.5 py-1 rounded-lg backdrop-blur-md">
             ₹${flavor.price}
           </span>
-          ${flavor.is_available === false ? '<span class="absolute inset-0 bg-zinc-950/70 flex items-center justify-center"><span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span></span>' : ''}
+          ${flavor.is_available === false
+            ? `<span class="absolute inset-0 bg-zinc-950/70 flex items-center justify-center">
+                 <span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>
+               </span>`
+            : ''}
         </div>
-        <h4 class="font-bold text-white text-base mb-1">${flavor.name}</h4>
-        <p class="text-xs text-zinc-400 leading-relaxed mb-4">${flavor.description || 'Authentic handcrafted goli soda.'}</p>
+        <div class="p-4 flex flex-col flex-grow justify-between">
+          <div>
+            <h4 class="font-bold text-white text-base mb-1">${flavor.name}</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed mb-4">${flavor.description || 'Authentic handcrafted goli soda.'}</p>
+          </div>
+          <button
+            onclick="${flavor.is_available !== false ? `addToCart(${flavor.id})` : ''}"
+            ${flavor.is_available === false ? 'disabled' : ''}
+            class="w-full ${flavor.is_available !== false
+              ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/10'
+              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'} font-black py-2.5 rounded-xl text-xs transition">
+            ${flavor.is_available !== false ? '+ Add to Cart' : 'Sold Out'}
+          </button>
+        </div>
       </div>
-
-      <button
-        onclick="${flavor.is_available !== false ? `addToCart(${flavor.id})` : ''}"
-        ${flavor.is_available === false ? 'disabled' : ''}
-        class="w-full ${flavor.is_available !== false ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/10' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'} font-black py-2.5 rounded-xl text-xs transition">
-        ${flavor.is_available !== false ? '+ Add to Cart' : 'Sold Out'}
-      </button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Cart State Operations
