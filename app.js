@@ -13,7 +13,7 @@ const supabaseClient = (window.supabase && typeof window.supabase.createClient =
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
-const supabase = supabaseClient;
+var supabase = supabaseClient;
 window.supabaseClient = supabaseClient;
 window._supabase = supabaseClient;
 
@@ -29,7 +29,7 @@ let currentUser = null; // Supabase auth user object
 function updateStoreState(isOnline) {
   const offlineBanner = document.getElementById('store-offline-banner');
   const checkoutBtns = document.querySelectorAll('#checkout-btn, #float-checkout-btn');
-  
+
   if (!isOnline) {
     offlineBanner?.classList.remove('hidden');
     checkoutBtns.forEach(btn => {
@@ -99,7 +99,7 @@ const popSound = document.getElementById('pop-sound');
 function playPop() {
   if (popSound) {
     popSound.currentTime = 0;
-    popSound.play().catch(() => {});
+    popSound.play().catch(() => { });
   }
 }
 
@@ -111,7 +111,7 @@ function startCarbonationEffect() {
   setInterval(() => {
     const bubble = document.createElement('div');
     bubble.classList.add('bubble');
-    
+
     // Randomize size, starting horizontal position, and speed
     const size = Math.random() * 8 + 4 + 'px';
     const left = Math.random() * 80 + 10 + '%';
@@ -137,9 +137,9 @@ const popSounds = ['soda-pop-1', 'soda-pop-2', 'soda-pop-3'];
 
 // Pop Bottle Animation Logic
 function popSodaBottle(element) {
-  const bottle = (element && element.querySelector ? element.querySelector('img') : null) || 
-                 document.getElementById('sodaBottle') || 
-                 document.getElementById('hero-soda-bottle');
+  const bottle = (element && element.querySelector ? element.querySelector('img') : null) ||
+    document.getElementById('sodaBottle') ||
+    document.getElementById('hero-soda-bottle');
   const fizz = document.getElementById('fizzEffect');
 
   // Trigger sound
@@ -251,14 +251,13 @@ function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   const isSuccess = type === 'success';
   const isInfo = type === 'info';
-  
-  toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl transition transform duration-300 translate-y-[-10px] opacity-0 ${
-    isSuccess 
-      ? 'bg-zinc-900 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10' 
+
+  toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl transition transform duration-300 translate-y-[-10px] opacity-0 ${isSuccess
+      ? 'bg-zinc-900 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10'
       : isInfo
         ? 'bg-zinc-900 border-cyan-500/50 text-cyan-400 shadow-cyan-500/10'
         : 'bg-zinc-900 border-red-500/50 text-red-400 shadow-red-500/10'
-  }`;
+    }`;
 
   const icon = isSuccess ? '🎉' : isInfo ? 'ℹ️' : '⚠️';
 
@@ -513,7 +512,7 @@ function renderAuthButton(user) {
   } else {
     // ── Logged-in: Avatar + first name + dropdown toggle ──
     const avatarUrl = user.user_metadata?.avatar_url || '';
-    const firstName  = (user.user_metadata?.full_name || user.email || 'User').split(' ')[0];
+    const firstName = (user.user_metadata?.full_name || user.email || 'User').split(' ')[0];
     const avatarHTML = avatarUrl
       ? `<img src="${avatarUrl}" alt="avatar" class="w-6 h-6 rounded-full object-cover border border-emerald-500/40">`
       : `<span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xs font-bold">${firstName[0].toUpperCase()}</span>`;
@@ -586,7 +585,7 @@ document.addEventListener('DOMContentLoaded', initAuth);
 document.getElementById('search-track-btn')?.addEventListener('click', () => {
   const query = document.getElementById('track-input').value.trim();
   const resultContainer = document.getElementById('tracking-result');
-  
+
   if (!query) return;
 
   // Render dummy data or replace with your Supabase query
@@ -704,7 +703,7 @@ function updateCartUI() {
   const miniCartBadge = document.getElementById('cart-badge');
   if (miniCartBadge) miniCartBadge.textContent = totalCount;
   if (cartDrawerCount) cartDrawerCount.textContent = `${totalCount} item${totalCount === 1 ? '' : 's'}`;
-  
+
   cartSubtotal.textContent = `₹${subtotal}`;
   cartTaxes.textContent = `₹${taxes}`;
   cartTotal.textContent = `₹${grandTotal}`;
@@ -735,7 +734,7 @@ function updateCartUI() {
 }
 
 // Temporary UPI Configuration (Update later with client's bank-linked VPA)
-const UPI_ID = "kickgolisoda@upi"; 
+const UPI_ID = "kickgolisoda@upi";
 const MERCHANT_NAME = "Kick Goli Soda";
 
 function openUpiCheckout(totalAmount) {
@@ -973,7 +972,7 @@ const menuSection = document.getElementById('menu');
 window.addEventListener('scroll', () => {
   if (!menuSection || !floatingBar) return;
   const menuPosition = menuSection.getBoundingClientRect().top;
-  
+
   // Show bar once scrolled past the top of the menu section
   if (menuPosition < window.innerHeight - 100) {
     floatingBar.classList.remove('translate-y-24', 'opacity-0');
@@ -1022,7 +1021,7 @@ function renderUserProfile() {
     if (profileName) profileName.textContent = fullName;
     if (profilePhone) profilePhone.textContent = emailOrPhone;
     if (profileAvatar) {
-      profileAvatar.innerHTML = avatarUrl 
+      profileAvatar.innerHTML = avatarUrl
         ? `<img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover rounded-full" />`
         : `<span>👤</span>`;
     }
