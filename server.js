@@ -4,7 +4,14 @@ const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-app.use(cors());
+
+// Enable CORS for Vercel and AWS deployments
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ukkhhhmjblzyuazumqpt.supabase.co';
