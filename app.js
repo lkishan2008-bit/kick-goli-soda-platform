@@ -19,13 +19,13 @@ window._supabase = supabaseClient;
 
 // Fallback catalog data when database connection is offline
 const LOCAL_FLAVORS = [
-  { id: 1, name: 'Ajjampura Classic Pop', category: 'Classic', price: 40, image_url: 'images/classic.jpg' },
-  { id: 2, name: 'Chikmagalur Ginger Kick', category: 'Spicy', price: 45, image_url: 'images/ginger.jpg' },
-  { id: 3, name: 'Malnad Lime Soda', category: 'Citrus', price: 40, image_url: 'images/lime.jpg' },
-  { id: 4, name: 'Jeera Masala Blast', category: 'Spicy', price: 45, image_url: 'images/jeera.jpg' },
-  { id: 5, name: 'Kachha Mango Pop', category: 'Fruity', price: 45, image_url: 'images/mango.jpg' },
-  { id: 6, name: 'Rose Heritage Fizz', category: 'Sweet', price: 50, image_url: 'images/rose.jpg' },
-  { id: 7, name: 'Blueberry Sparkle', category: 'Fruity', price: 50, image_url: 'images/blueberry.jpg' }
+  { id: 1, name: 'Ajjampura Classic Pop',   category: 'Classic', price: 40, image_url: 'images/paneer-soda.jpg' },
+  { id: 2, name: 'Chikmagalur Ginger Kick', category: 'Spicy',   price: 45, image_url: 'images/jeera-lemon.jpg' },
+  { id: 3, name: 'Malnad Lime Soda',        category: 'Citrus',  price: 40, image_url: 'images/tangy-orange.jpg' },
+  { id: 4, name: 'Jeera Masala Blast',      category: 'Spicy',   price: 45, image_url: 'images/masala-cola.jpg' },
+  { id: 5, name: 'Kachha Mango Pop',        category: 'Fruity',  price: 45, image_url: 'images/raw-mango.jpg' },
+  { id: 6, name: 'Rose Heritage Fizz',      category: 'Sweet',   price: 50, image_url: 'images/grape-fizz.jpg' },
+  { id: 7, name: 'Blueberry Sparkle',       category: 'Fruity',  price: 50, image_url: 'images/blue-lagoon.jpg' }
 ];
 
 
