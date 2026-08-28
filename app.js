@@ -237,32 +237,40 @@ function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
+  // Create toast card element
   const toast = document.createElement('div');
   const isSuccess = type === 'success';
-
-  toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold transform transition-all duration-300 translate-y-5 opacity-0 ${
+  const isInfo = type === 'info';
+  
+  toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl transition transform duration-300 translate-y-[-10px] opacity-0 ${
     isSuccess 
-      ? 'bg-zinc-900 text-emerald-400 border-emerald-500/30' 
-      : 'bg-zinc-900 text-rose-400 border-rose-500/30'
+      ? 'bg-zinc-900 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10' 
+      : isInfo
+        ? 'bg-zinc-900 border-cyan-500/50 text-cyan-400 shadow-cyan-500/10'
+        : 'bg-zinc-900 border-red-500/50 text-red-400 shadow-red-500/10'
   }`;
 
+  const icon = isSuccess ? '🎉' : isInfo ? 'ℹ️' : '⚠️';
+
   toast.innerHTML = `
-    <span>${isSuccess ? '✅' : '⚠️'}</span>
-    <span>${message}</span>
+    <span class="text-xl">${icon}</span>
+    <p class="text-sm font-semibold text-white">${message}</p>
   `;
 
   container.appendChild(toast);
 
-  // Animate in
-  setTimeout(() => {
-    toast.classList.remove('translate-y-5', 'opacity-0');
-  }, 10);
+  // Trigger smooth drop-in transition
+  requestAnimationFrame(() => {
+    toast.classList.remove('translate-y-[-10px]', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+  });
 
-  // Animate out and remove
+  // Auto remove after 3.5 seconds
   setTimeout(() => {
-    toast.classList.add('translate-y-5', 'opacity-0');
+    toast.classList.remove('translate-y-0', 'opacity-100');
+    toast.classList.add('translate-y-[-10px]', 'opacity-0');
     setTimeout(() => toast.remove(), 300);
-  }, 3000);
+  }, 3500);
 }
 
 // Cart Drawer & Modal Controls
