@@ -640,50 +640,50 @@ function filterFlavors(category) {
 
 // Render Flavors as Cards
 function renderFlavors(flavors) {
-  const container = document.getElementById('flavor-grid');
+  const container = document.getElementById('flavor-grid') || document.getElementById('flavors-grid');
   const status = document.getElementById('status-indicator');
   if (!container) return;
 
   if (status) status.textContent = `${flavors.length} flavors shown`;
 
   if (flavors.length === 0) {
-    container.innerHTML = `<p class="text-zinc-400 col-span-full py-8 text-center">No flavors found in this category.</p>`;
+    container.innerHTML = `<p class="text-gray-400 col-span-full py-8 text-center">No flavors found in this category.</p>`;
     return;
   }
 
   container.innerHTML = flavors.map(flavor => {
-    const primaryImg = flavor.image_url || flavor.fallback_image || '';
+    const imgSrc = flavor.image_url || flavor.fallback_image || '';
     const fallbackImg = flavor.fallback_image || 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80';
 
     return `
-      <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-emerald-500/50 transition duration-300 shadow-xl backdrop-blur-sm group">
-        <div class="relative h-48 w-full bg-zinc-950 overflow-hidden">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-300">
+        <div class="relative h-48 w-full bg-gray-950 overflow-hidden">
           <img
-            src="${primaryImg}"
+            src="${imgSrc}"
             onerror="this.onerror=null; this.src='${fallbackImg}';"
             alt="${flavor.name}"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
-          <span class="absolute top-3 right-3 bg-zinc-950/80 border border-zinc-800 text-emerald-400 font-black text-xs px-2.5 py-1 rounded-lg backdrop-blur-md">
+          <span class="absolute top-3 right-3 bg-emerald-500 text-black font-bold text-xs px-2.5 py-1 rounded-full">
             ₹${flavor.price}
           </span>
           ${flavor.is_available === false
-            ? `<span class="absolute inset-0 bg-zinc-950/70 flex items-center justify-center">
-                 <span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>
+            ? `<span class="absolute inset-0 bg-gray-950/75 flex items-center justify-center">
+                 <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>
                </span>`
             : ''}
         </div>
         <div class="p-4 flex flex-col flex-grow justify-between">
           <div>
-            <h4 class="font-bold text-white text-base mb-1">${flavor.name}</h4>
-            <p class="text-xs text-zinc-400 leading-relaxed mb-4">${flavor.description || 'Authentic handcrafted goli soda.'}</p>
+            <h3 class="text-white font-bold text-lg mb-1">${flavor.name}</h3>
+            <p class="text-gray-400 text-sm mb-4">${flavor.description || 'Authentic handcrafted goli soda.'}</p>
           </div>
           <button
             onclick="${flavor.is_available !== false ? `addToCart(${flavor.id})` : ''}"
             ${flavor.is_available === false ? 'disabled' : ''}
             class="w-full ${flavor.is_available !== false
-              ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/10'
-              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'} font-black py-2.5 rounded-xl text-xs transition">
+              ? 'bg-emerald-400 hover:bg-emerald-300 text-black'
+              : 'bg-gray-700 text-gray-500 cursor-not-allowed'} font-bold py-2 rounded-lg transition-colors">
             ${flavor.is_available !== false ? '+ Add to Cart' : 'Sold Out'}
           </button>
         </div>
