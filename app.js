@@ -5,17 +5,28 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// 1. Safe Supabase Client Init
+// Supabase Setup
 const SUPABASE_URL = 'https://ukkhhmjblzyuazumqpt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xw9zPwzWtqGn86_Q_TA0_FNrn';
 
-const supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function')
+var supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function')
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
 var supabase = supabaseClient;
 window.supabaseClient = supabaseClient;
 window._supabase = supabaseClient;
+
+// Fallback catalog data when database connection is offline
+const LOCAL_FLAVORS = [
+  { id: 1, name: 'Ajjampura Classic Pop', category: 'Classic', price: 40, image_url: 'images/classic.jpg' },
+  { id: 2, name: 'Chikmagalur Ginger Kick', category: 'Spicy', price: 45, image_url: 'images/ginger.jpg' },
+  { id: 3, name: 'Malnad Lime Soda', category: 'Citrus', price: 40, image_url: 'images/lime.jpg' },
+  { id: 4, name: 'Jeera Masala Blast', category: 'Spicy', price: 45, image_url: 'images/jeera.jpg' },
+  { id: 5, name: 'Kachha Mango Pop', category: 'Fruity', price: 45, image_url: 'images/mango.jpg' },
+  { id: 6, name: 'Rose Heritage Fizz', category: 'Sweet', price: 50, image_url: 'images/rose.jpg' },
+  { id: 7, name: 'Blueberry Sparkle', category: 'Fruity', price: 50, image_url: 'images/blueberry.jpg' }
+];
 
 
 // Application State
@@ -941,25 +952,22 @@ async function trackOrder() {
   }
 }
 
-// 4. Safe Flavor Text Update
 async function fetchFlavors() {
-  if (!supabaseClient || typeof supabaseClient.from !== 'function') return;
-
-  const status = document.getElementById('status-indicator');
   const textElement = document.getElementById('flavor-count-text');
-  if (textElement) {
-    textElement.textContent = '7 Authentic Flavors';
-  }
+  if (textElement) textElement.textContent = '7 Authentic Flavors';
 
   try {
-    const { data, error } = await supabaseClient.from('flavors').select('*');
-    if (error) throw error;
+    if (!supabaseClient) throw new Error("Supabase client offline");
 
-    menuFlavors = data || [];
+    const { data, error } = await supabaseClient.from('flavors').select('*');
+    if (error || !data || data.length === 0) throw error || new Error("No data returned");
+
+    menuFlavors = data;
     renderFlavors(menuFlavors);
   } catch (err) {
-    console.error('Database connection error:', err);
-    if (status) status.textContent = 'Connection Error';
+    console.warn('Using local flavor backup due to database reachability:', err.message);
+    menuFlavors = LOCAL_FLAVORS;
+    renderFlavors(menuFlavors);
   }
 }
 
