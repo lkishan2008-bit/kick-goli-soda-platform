@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Orders | Kick Goli Soda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col font-sans">
+
+  <!-- Header / Navigation -->
+  <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-black text-xl tracking-wider text-white">
+        <span class="bg-emerald-500 text-zinc-950 px-2 py-0.5 rounded-lg text-sm">KICK</span> GOLI SODA
+      </a>
+      <a href="index.html" class="text-sm font-semibold text-zinc-400 hover:text-emerald-400 transition">← Back to Shop</a>
+    </div>
+  </header>
+
+  <!-- Main Orders Content -->
+  <main class="max-w-5xl mx-auto px-4 py-10 flex-1 w-full">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-black text-white">Order History</h1>
+        <p class="text-sm text-zinc-400 mt-1">Track your recent soda purchases</p>
+      </div>
+      <button onclick="fetchOrders()" class="px-4 py-2 bg-zinc-900 border border-zinc-700 hover:border-emerald-500 text-xs font-semibold rounded-lg text-zinc-300 transition flex items-center gap-2">
+        <span>🔄</span> Refresh
+      </button>
+    </div>
+
+    <!-- Orders Table Container -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-400">
+          <thead class="bg-zinc-950/50 text-xs uppercase font-extrabold text-zinc-400 border-b border-zinc-800">
+            <tr>
+              <th class="px-6 py-4">Order ID</th>
+              <th class="px-6 py-4">Item / Details</th>
+              <th class="px-6 py-4">Amount</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4">Date</th>
+            </tr>
+          </thead>
+          <tbody id="orders-list-body" class="divide-y divide-zinc-800">
+            <!-- Dynamic rows will inject here -->
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-zinc-500 font-medium">Loading orders...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof fetchOrders === 'function') {
+        fetchOrders();
+      }
+    });
+  </script>
+</body>
+</html>

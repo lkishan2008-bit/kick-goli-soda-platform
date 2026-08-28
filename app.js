@@ -9,8 +9,10 @@ if ('serviceWorker' in navigator) {
 const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabaseClient;
 const _supabase = supabaseClient; // Alias for _supabase
 window._supabase = _supabase;
+window.supabaseClient = supabaseClient;
 
 
 // Application State
@@ -289,9 +291,9 @@ function openCheckoutModal() {
   toggleCart(true);
 }
 
-cartToggleBtn.addEventListener('click', () => toggleCart(true));
-cartCloseBtn.addEventListener('click', () => toggleCart(false));
-cartOverlay.addEventListener('click', () => toggleCart(false));
+cartToggleBtn?.addEventListener('click', () => toggleCart(true));
+cartCloseBtn?.addEventListener('click', () => toggleCart(false));
+cartOverlay?.addEventListener('click', () => toggleCart(false));
 
 // Tracking Modal Controls
 function openTrackOrderModal() {
@@ -821,12 +823,60 @@ async function submitOrder() {
   }
 }
 
-orderForm.addEventListener('submit', async (e) => {
+orderForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const grandTotal = subtotal + (subtotal > 0 ? Math.round(subtotal * 0.05) : 0);
   openUpiCheckout(grandTotal);
 });
+
+// Fetch and render past orders for orders.html
+async function fetchOrders() {
+  const tbody = document.getElementById('orders-list-body');
+  if (!tbody) return;
+
+  try {
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!orders || orders.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="px-6 py-8 text-center text-zinc-500 font-medium">No orders found yet. Time to grab a soda! 🍾</td>
+        </tr>`;
+      return;
+    }
+
+    tbody.innerHTML = orders.map(order => {
+      const itemName = order.item_name || (Array.isArray(order.items) ? order.items.map(i => `${i.name || i.flavor} (x${i.quantity || 1})`).join(', ') : 'Kick Goli Soda');
+      const orderAmount = order.amount || order.total_amount || 40;
+
+      return `
+      <tr class="hover:bg-zinc-800/40 transition">
+        <td class="px-6 py-4 font-mono text-xs text-zinc-400">#${order.id || 'N/A'}</td>
+        <td class="px-6 py-4 font-bold text-white">${itemName}</td>
+        <td class="px-6 py-4 font-extrabold text-emerald-400">₹${orderAmount}</td>
+        <td class="px-6 py-4">
+          <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-500/30">
+            ${order.status || 'Completed'}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-xs text-zinc-500">${new Date(order.created_at || Date.now()).toLocaleDateString()}</td>
+      </tr>
+    `;
+    }).join('');
+  } catch (err) {
+    console.error('Fetch orders error:', err);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="px-6 py-8 text-center text-red-400 font-medium">Failed to load orders. Check your Supabase connection.</td>
+      </tr>`;
+  }
+}
 
 // Live Order Tracking Search
 async function trackOrder() {
