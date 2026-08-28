@@ -5,12 +5,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Supabase Configuration
-const SUPABASE_URL = 'https://ukkhhhmjblzyuazumqpt.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xW9zPwzWtqGn86_Q_TA0_FNrn';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase Initialization
+const SUPABASE_URL = 'https://ukkhhmjblzyuazumqpt.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_u0xqV1xw9zPwzWtqGn86_Q_TA0_FNrn';
+
+// Initialize single Supabase instance safely
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const supabase = supabaseClient;
-const _supabase = supabaseClient; // Alias for _supabase
+const _supabase = supabaseClient;
 window._supabase = _supabase;
 window.supabaseClient = supabaseClient;
 
@@ -44,6 +46,8 @@ function updateStoreState(isOnline) {
 
 // Fetch store status on load and subscribe to real-time changes
 async function initStoreStatusListener() {
+  if (!supabaseClient) return;
+
   // Initial fetch
   const { data } = await supabaseClient.from('store_settings').select('is_online').eq('id', 1).single();
   if (data) {
@@ -552,7 +556,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ── Supabase Auth State Listener ─────────────────────────────────────────────
-supabaseClient.auth.onAuthStateChange((_event, session) => {
+supabaseClient?.auth?.onAuthStateChange((_event, session) => {
   currentUser = session?.user || null;
   renderAuthButton(currentUser);
   renderUserProfile();
@@ -560,6 +564,7 @@ supabaseClient.auth.onAuthStateChange((_event, session) => {
 
 // Bootstrap auth on page load
 async function initAuth() {
+  if (!supabaseClient) return;
   const { data: { session } } = await supabaseClient.auth.getSession();
   currentUser = session?.user || null;
   renderAuthButton(currentUser);
